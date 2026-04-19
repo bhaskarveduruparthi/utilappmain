@@ -1,0 +1,379 @@
+/* ============================================================
+   SHARED THEME — All Timesheet / VoiceHub / KNR Pages
+   Add to src/styles.scss or import as src/styles/shared.scss
+   ============================================================ */
+
+/* ── CSS Variables ── */
+:root {
+  --color-navy:        #1E3A5F;
+  --color-navy-dark:   #162D4D;
+  --color-green:       #16A34A;
+  --color-indigo:      #4F46E5;
+  --color-amber:       #D97706;
+  --color-red:         #DC2626;
+  --color-purple:      #7C3AED;
+
+  --color-slate-50:    #F8FAFC;
+  --color-slate-100:   #F1F5F9;
+  --color-slate-200:   #E5E7EB;
+  --color-slate-300:   #D1D5DB;
+  --color-slate-400:   #9CA3AF;
+  --color-slate-500:   #6B7280;
+  --color-slate-700:   #374151;
+  --color-slate-800:   #1E293B;
+  --color-slate-900:   #111827;
+
+  --radius-sm:         6px;
+  --radius-md:         8px;
+  --radius-lg:         12px;
+  --radius-xl:         16px;
+
+  --shadow-sm:         0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:         0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+}
+
+/* ── Page shell — applied to ALL pages ── */
+.page-shell,
+.ts-page,
+.rpt-page,
+.mp-page,
+.hist-page,
+.team-page,
+.dash-page {
+  padding: 1.5rem 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 0.875rem;
+  color: var(--color-slate-900);
+}
+
+/* ── Page headers — same across all pages ── */
+.page-header,
+.mp-header,
+.rpt-header,
+.hist-header,
+.team-header,
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Shared page title */
+.page-title,
+.mp-title,
+.rpt-title,
+.hist-title,
+.team-title,
+.dash-title {
+  font-size: 1.8rem !important;
+  font-weight: 800 !important;
+  color: var(--color-slate-900) !important;
+  margin: 0 0 0.2rem !important;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+/* Shared page subtitle */
+.page-sub,
+.mp-sub,
+.rpt-sub,
+.hist-sub,
+.team-sub,
+.dash-sub {
+  font-size: 0.9rem !important;
+  color: var(--color-slate-500) !important;
+}
+
+/* ── KPI / Stat cards ── */
+.kpi-card,
+.sum-card,
+.ts-meta-card,
+.stat-card {
+  background: white;
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, transform 0.15s;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+}
+
+/* KPI left-border accent strip */
+.kpi-card {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  }
+  &.kpi-navy::before   { background: var(--color-navy); }
+  &.kpi-green::before  { background: var(--color-green); }
+  &.kpi-purple::before { background: var(--color-purple); }
+  &.kpi-amber::before  { background: var(--color-amber); }
+  &.kpi-red::before    { background: var(--color-red); }
+  &.kpi-indigo::before { background: var(--color-indigo); }
+}
+
+.kpi-val, .sum-val, .sc-count, .ss-val {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-slate-900);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.kpi-lbl, .sum-lbl, .sc-label, .ss-lbl,
+.ts-meta-label, .stat-lbl {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* KPI icon circle */
+.kpi-icon {
+  width: 30px; height: 30px;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; flex-shrink: 0;
+
+  &.ki-blue   { background: #EEF2FF; color: var(--color-indigo); }
+  &.ki-green  { background: #F0FDF4; color: var(--color-green); }
+  &.ki-purple { background: #FAF5FF; color: var(--color-purple); }
+  &.ki-amber  { background: #FFFBEB; color: var(--color-amber); }
+  &.ki-red    { background: #FEF2F2; color: var(--color-red); }
+  &.ki-sky    { background: #F0F9FF; color: #0284C7; }
+}
+
+/* ── Stats bar (horizontal summary) ── */
+.stats-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 2rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.stat-item { text-align: center; padding: 0 1.25rem; }
+.stat-sep  { width: 1px; height: 32px; background: var(--color-slate-200); }
+
+/* ── Shared table card ── */
+.table-card,
+.mp-table-card,
+.hist-table-card,
+.team-table-card {
+  background: white;
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── PrimeNG p-table overrides ── */
+::ng-deep {
+  .p-datatable {
+    .p-datatable-thead > tr > th {
+      background: var(--color-slate-50) !important;
+      padding: 0.75rem 1rem !important;
+      font-size: 0.78rem !important;
+      font-weight: 600 !important;
+      color: var(--color-slate-500) !important;
+      border-bottom: 2px solid var(--color-slate-200) !important;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .p-datatable-tbody > tr > td {
+      padding: 0.75rem 1rem !important;
+      font-size: 0.875rem !important;
+      color: var(--color-slate-800) !important;
+      border-bottom: 1px solid var(--color-slate-100) !important;
+    }
+
+    .p-datatable-tbody > tr:hover > td {
+      background: var(--color-slate-50) !important;
+    }
+  }
+}
+
+/* ── Employee ID / Code badges ── */
+.emp-id, .proj-code, .id-badge, .code-badge {
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 0.76rem;
+  background: var(--color-slate-100);
+  color: var(--color-slate-700);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* ── Type / status pills ── */
+.type-pill, .status-pill, .proj-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.type-billable, .status-acquired { background: #DCFCE7; color: #166534; }
+.type-internal,  .status-active   { background: #DBEAFE; color: #1E40AF; }
+.type-leave                        { background: #FEF3C7; color: #92400E; }
+.type-pmo,       .status-prospect { background: #F3E8FF; color: #7E22CE; }
+.status-inactive                   { background: #F3F4F6; color: var(--color-slate-500); }
+.status-lost,    .status-danger    { background: #FEE2E2; color: #991B1B; }
+
+/* ── Avatar circles ── */
+.name-avatar, .res-av, .mgr-avatar, .uc-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--color-navy);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+/* ── Buttons ── */
+.btn-primary, .add-btn, .save-btn {
+  background: var(--color-navy) !important;
+  border-color: var(--color-navy) !important;
+  color: white !important;
+  font-weight: 600;
+  border-radius: var(--radius-md) !important;
+
+  &:hover:not(:disabled) {
+    background: var(--color-navy-dark) !important;
+    border-color: var(--color-navy-dark) !important;
+  }
+}
+
+/* ── Search input ── */
+.search-input, .search-box {
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.875rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:focus {
+    border-color: var(--color-navy);
+    box-shadow: 0 0 0 3px rgba(30,58,95,0.08);
+  }
+}
+
+/* ── Form fields ── */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-slate-700);
+  }
+
+  .req, .req::after { color: #EF4444; }
+  .field-error { font-size: 0.72rem; color: var(--color-red); }
+}
+
+/* ── Utilization progress bars ── */
+.util-track, .mini-bar, .prog-bar-wrap, .h-bar {
+  height: 6px;
+  background: var(--color-slate-200);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.util-fill, .mini-fill, .prog-bar, .h-fill {
+  height: 100%;
+  background: var(--color-navy);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+
+  &.low  { background: var(--color-red); }
+  &.high { background: var(--color-green); }
+  &.over { background: linear-gradient(90deg, #EF4444, var(--color-red)); }
+}
+
+/* ── Dialog standardization ── */
+::ng-deep {
+  .p-dialog .p-dialog-header {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-slate-900);
+    border-bottom: 1px solid var(--color-slate-200);
+    padding: 1rem 1.25rem;
+  }
+  .p-dialog .p-dialog-content {
+    padding: 1.25rem;
+  }
+  .p-dialog .p-dialog-footer {
+    border-top: 1px solid var(--color-slate-200);
+    padding: 0.875rem 1.25rem;
+  }
+}
+
+/* ── Toast ── */
+::ng-deep .p-toast { font-size: 0.875rem; }
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-slate-400);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+
+  i { font-size: 2.25rem; color: var(--color-slate-300); }
+  p { font-size: 0.9rem; margin: 0; }
+}
+
+/* ── Skeleton rows ── */
+.skeleton-wrap { padding: 1rem 1.25rem; }
+
+/* ── Responsive breakpoints ── */
+@media (max-width: 1024px) {
+  .page-shell,
+  .ts-page, .rpt-page, .mp-page,
+  .hist-page, .team-page, .dash-page {
+    padding: 1rem 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-title, .mp-title, .rpt-title,
+  .hist-title, .team-title, .dash-title {
+    font-size: 1.4rem !important;
+  }
+  .kpi-val, .sum-val { font-size: 1.45rem; }
+}
