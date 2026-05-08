@@ -156,16 +156,7 @@ import { AuthenticationService } from '../service/authentication.service';
           </div>
         </div>
 
-        <div class="kpi-card kpi-leave">
-          <div class="kpi-header">
-            <span class="kpi-lbl">Leave Hours</span>
-            <div class="kpi-icon kpi-icon-red"><i class="pi pi-calendar-times"></i></div>
-          </div>
-          <div class="kpi-val">{{ s.leave_hours | number:'1.0-0' }}</div>
-          <div class="kpi-footer">
-            <span class="kpi-badge kpi-badge-orange">+ {{ s.pmo_hours | number:'1.0-0' }}h PMO</span>
-          </div>
-        </div>
+        
 
       }
     }
@@ -466,8 +457,6 @@ import { AuthenticationService } from '../service/authentication.service';
                   <th>Manager (IRM)</th>
                   <th class="num-h">Total Hrs</th>
                   <th class="num-h">Billable</th>
-                  <th class="num-h">Internal</th>
-                  <th class="num-h">Leave</th>
                   <th class="num-h">Scheduled</th>
                   <th>Utilization</th>
                   <th class="num-h">Billable %</th>
@@ -487,8 +476,6 @@ import { AuthenticationService } from '../service/authentication.service';
                     <td><span class="irm-text">{{ r.irm || '—' }}</span></td>
                     <td class="num-td"><strong>{{ r.total_hours }}</strong></td>
                     <td class="num-td green-val">{{ r.billable_hours }}</td>
-                    <td class="num-td">{{ r.internal_hours }}</td>
-                    <td class="num-td orange-val">{{ r.leave_hours }}</td>
                     <td class="num-td muted-val">{{ r.scheduled_hours }}</td>
                     <td>
                       <div class="util-cell">
@@ -809,7 +796,7 @@ import { AuthenticationService } from '../service/authentication.service';
     ───────────────────────────────────────────────── */
     .kpi-strip {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 1rem;
       margin-bottom: 1.25rem;
     }
