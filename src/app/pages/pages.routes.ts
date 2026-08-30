@@ -12,6 +12,7 @@ export default [
     { path: 'login-history', component: LoginHistory, title: 'Login History' },
     { path: 'timesheet', component: SubmitTimesheetComponent, title: 'Submit Timesheet' },
     {path: 'manage-projects', loadComponent: () => import('./timesheet/manageprojects.component').then(m => m.ManageProjectsComponent), title: 'Manage Projects' },
+    {path: 'project-allocations', loadComponent: () => import('./timesheet/projectallocations.component').then(m => m.ProjectAllocationsComponent), title: 'Project Allocations' },
     {path: 'timesheet/history', loadComponent: () => import('./timesheet/timesheethistory.component').then(m => m.TimesheetHistoryComponent), title: 'Timesheet History' },
     { path: 'reports', component: ReportsComponent, title: 'Utilization Reports' },
     { path: 'team', component: TeamTimesheetsComponent, title: 'Team Timesheets' },

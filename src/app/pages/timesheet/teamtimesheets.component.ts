@@ -633,7 +633,17 @@ export class TeamTimesheetsComponent implements OnInit {
   this.loadTeam();
 }
 
-  weekStartIso() { return this.currentWeekStart.toISOString().split('T')[0]; }
+  // Local Y/M/D formatting, not toISOString(): currentWeekStart is pinned to local
+  // midnight, and toISOString() converts to UTC first — in IST (UTC+5:30) that rolls
+  // the date back to Sunday, which the backend's get_week_dates() then re-snaps to
+  // *last* Monday, showing the manager a week that's a full 7 days too early.
+  weekStartIso() {
+    const d = this.currentWeekStart;
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
 
   loadTeam(isInitialLoad = false) {
   this.loading.set(true);

@@ -41,6 +41,7 @@ export class AppMenu implements OnInit {
             icon: 'pi pi-fw pi-calendar',
             items: [
                 { label: 'Manage Projects', icon: 'pi pi-fw pi-folder', routerLink: ['/app/pages/manage-projects'] },
+                { label: 'Project Allocations', icon: 'pi pi-fw pi-user-plus', routerLink: ['/app/pages/project-allocations'] },
                 { label: 'Validate Timesheets', icon: 'pi pi-fw pi-users', routerLink: ['/app/pages/team'] },
                 { label: 'Submit Timesheet', icon: 'pi pi-fw pi-plus', routerLink: ['/app/pages/timesheet'] },
                 { label: 'Timesheet History', icon: 'pi pi-fw pi-clock', routerLink: ['/app/pages/timesheet/history'] }
@@ -88,6 +89,7 @@ export class AppMenu implements OnInit {
                 
                 
                 { label: 'Manage Projects', icon: 'pi pi-fw pi-folder', routerLink: ['/app/pages/manage-projects'] },
+                { label: 'Project Allocations', icon: 'pi pi-fw pi-user-plus', routerLink: ['/app/pages/project-allocations'] },
                 { label: 'Validate Timesheets', icon: 'pi pi-fw pi-users', routerLink: ['/app/pages/team'] },
             ]
         },

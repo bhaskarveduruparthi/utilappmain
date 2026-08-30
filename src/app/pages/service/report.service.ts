@@ -21,7 +21,7 @@ export class ReportsService {
  
   exportWeekly(weekStart: string): Observable<Blob> {
     const params = new HttpParams().set('week_start', weekStart);
-    return this.http.get(`${this.base}reports/weekly/export`, { params, responseType: 'blob' });
+    return this.http.get(`${this.base}reports/export/weekly`, { params, responseType: 'blob' });
   }
  
   // ── Monthly ─────────────────────────────────────────────────────────────────
@@ -32,7 +32,7 @@ export class ReportsService {
  
   exportMonthly(year: number, month: number): Observable<Blob> {
     const params = new HttpParams().set('year', year).set('month', month);
-    return this.http.get(`${this.base}reports/monthly/export`, { params, responseType: 'blob' });
+    return this.http.get(`${this.base}reports/export/monthly`, { params, responseType: 'blob' });
   }
  
   // ── Yearly ──────────────────────────────────────────────────────────────────
@@ -43,18 +43,18 @@ export class ReportsService {
  
   exportYearly(year: number): Observable<Blob> {
     const params = new HttpParams().set('year', year);
-    return this.http.get(`${this.base}reports/yearly/export`, { params, responseType: 'blob' });
+    return this.http.get(`${this.base}reports/export/yearly`, { params, responseType: 'blob' });
   }
  
   // ── Custom Range ─────────────────────────────────────────────────────────────
   getCustomReport(from: string, to: string): Observable<any> {
-    const params = new HttpParams().set('from', from).set('to', to);
+    const params = new HttpParams().set('from_date', from).set('to_date', to);
     return this.http.get(`${this.base}reports/custom`, { params });
   }
  
   exportCustom(from: string, to: string): Observable<Blob> {
-    const params = new HttpParams().set('from', from).set('to', to);
-    return this.http.get(`${this.base}reports/custom/export`, { params, responseType: 'blob' });
+    const params = new HttpParams().set('from_date', from).set('to_date', to);
+    return this.http.get(`${this.base}reports/export/custom`, { params, responseType: 'blob' });
   }
  
   // ── Utility ──────────────────────────────────────────────────────────────────

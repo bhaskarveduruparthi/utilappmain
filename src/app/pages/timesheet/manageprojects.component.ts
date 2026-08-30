@@ -390,9 +390,6 @@ export class ManageProjectsComponent implements OnInit {
 
   projectTypes = [
     { label: 'Billable', value: 'Billable', color: '#16A34A' },
-    { label: 'Internal', value: 'Internal', color: '#1D4ED8' },
-    { label: 'Leave', value: 'Leave', color: '#D97706' },
-    { label: 'PMO', value: 'PMO', color: '#7C3AED' },
   ];
 
   projectTypeOptions = this.projectTypes.map(t => ({ label: t.label, value: t.value }));
@@ -445,10 +442,15 @@ export class ManageProjectsComponent implements OnInit {
   }
 
   loadCustomers() {
-    this.http.get<Customer[]>(`${this.apiBase}/customers/getallcustomers`).subscribe({
-      next: (data) => {
+    // getallcustomers is paginated (10/page) — use the unpaginated
+    // "records" endpoint so the dropdown lists every customer.
+    this.http.get<{ data: Customer[] }>(`${this.apiBase}/customers/getallcustomersrecords`).subscribe({
+      next: (res) => {
+        const data = res.data || [];
         this.customers.set(data);
-        this.customerOptions = data.map(c => ({ label: c.customer_name, value: c.id }));
+        this.customerOptions = data
+          .map(c => ({ label: c.customer_name, value: c.id }))
+          .sort((a, b) => a.label.localeCompare(b.label));
       }
     });
   }

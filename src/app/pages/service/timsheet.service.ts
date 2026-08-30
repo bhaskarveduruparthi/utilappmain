@@ -37,6 +37,35 @@ export class TimesheetService {
     return this.http.get<any[]>(`${this.base}timesheet/projects`);
   }
 
+  /** Projects the *current* user may log timesheet hours against (assignment-gated for Billable projects). */
+  getMyTimesheetProjects(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.base}timesheet/my-projects`);
+  }
+
+  /** Manager/Superadmin only: users this manager may assign projects to. */
+  getAllocatableUsers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.base}timesheet/allocatable-users`);
+  }
+
+  /** Manager/Superadmin only: list project allocations, optionally for one user. */
+  getAllocations(userId?: number): Observable<any[]> {
+    let params = new HttpParams();
+    if (userId) params = params.set('user_id', userId);
+    return this.http.get<any[]>(`${this.base}timesheet/allocations`, { params });
+  }
+
+  createAllocation(payload: { user_id: number; project_id: number; start_date: string; end_date?: string | null }): Observable<any> {
+    return this.http.post<any>(`${this.base}timesheet/allocate`, payload);
+  }
+
+  updateAllocation(id: number, payload: { start_date?: string; end_date?: string | null }): Observable<any> {
+    return this.http.put<any>(`${this.base}timesheet/allocations/${id}`, payload);
+  }
+
+  deleteAllocation(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.base}timesheet/allocations/${id}`);
+  }
+
   getWeekTimesheet(weekStart: string): Observable<any> {
     return this.http.get<any>(`${this.base}timesheet/week`, {
       params: new HttpParams().set('week_start', weekStart)

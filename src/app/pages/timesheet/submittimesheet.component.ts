@@ -488,7 +488,9 @@ nextWeek() {
   }
 
   loadProjects() {
-    this.tsService.getProjects().subscribe({
+    // Only projects assigned (and currently active) for this user, plus non-Billable
+    // projects which stay open to everyone — see /timesheet/my-projects on the backend.
+    this.tsService.getMyTimesheetProjects().subscribe({
       next: (projects) => {
         this.projectOptions = projects.map((p: any) => ({ label: p.project_name, value: p.id, type: p.project_type }));
       }
@@ -601,7 +603,11 @@ nextWeek() {
 
   copyPrevWeek() {
     const prev = new Date(this.currentWeekStart); prev.setDate(prev.getDate() - 7);
-    this.tsService.getWeekTimesheet(prev.toISOString().split('T')[0]).subscribe({
+    // Local Y/M/D, not toISOString() — currentWeekStart is local midnight, and
+    // toISOString() would roll it back a day in IST, making the backend snap to the
+    // wrong Monday (a week earlier than intended).
+    const prevIso = `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}-${String(prev.getDate()).padStart(2, '0')}`;
+    this.tsService.getWeekTimesheet(prevIso).subscribe({
       next: (ts: any) => {
         if (ts.entries?.length > 0) {
           this.rows.set(ts.entries.map((e: any) => ({ ...this.emptyRow(), project_id: e.project_id, project_name: e.project_name, project_code: e.project_code, project_type: e.project_type })));

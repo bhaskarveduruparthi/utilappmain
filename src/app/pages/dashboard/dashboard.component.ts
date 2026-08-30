@@ -170,7 +170,7 @@ import { AuthenticationService } from '../service/authentication.service';
       <div class="card-header">
         <div class="card-title-group">
           <span class="card-title">Utilization Trend</span>
-          <span class="card-sub">Stacked hours breakdown</span>
+          <span class="card-sub">Billable hours trend</span>
         </div>
         <div class="trend-tabs">
           <button class="ttab" [class.active]="trendView() === 'week'"  (click)="setTrendView('week')">Weekly</button>
@@ -832,7 +832,6 @@ import { AuthenticationService } from '../service/authentication.service';
     .kpi-util::before     { background: var(--purple); }
     .kpi-resources::before{ background: var(--sky); }
     .kpi-compliance::before{ background: var(--amber); }
-    .kpi-leave::before    { background: var(--red); }
     .kpi-skel::before     { display: none; }
 
     .kpi-skel {
@@ -1734,7 +1733,18 @@ export class DashboardComponent implements OnInit {
     this.applyPreset(this.periodPresets.find(p => p.key === 'ytd')!);
   }
 
-  toIso(d: Date): string { return d.toISOString().split('T')[0]; }
+  // Local Y/M/D formatting (NOT toISOString) — toISOString() converts to UTC first,
+  // which silently shifts the date back a day for any positive UTC-offset timezone
+  // (e.g. IST, UTC+5:30) whenever the Date is pinned to local midnight (all of our
+  // preset/date-range values are). That was cutting the *last* day off ranges like
+  // "This Month"/"Custom" and silently widening the start, causing Dashboard totals
+  // to disagree with the Reports page for the same period.
+  toIso(d: Date): string {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
 
   isManagerOrAdmin(): boolean {
     const u = this.authService.userValue;
@@ -1879,9 +1889,6 @@ export class DashboardComponent implements OnInit {
       labels: items.map((i: any) => view === 'year' ? String(i.year) : (i.week ?? i.month ?? '')),
       datasets: [
         { label: 'Billable',  data: items.map((i: any) => i.billable  ?? 0), backgroundColor: '#16A34A', borderRadius: 5, stack: 'A', borderSkipped: false },
-        { label: 'Internal',  data: items.map((i: any) => i.internal  ?? 0), backgroundColor: '#3B82F6', borderRadius: 0, stack: 'A', borderSkipped: false },
-        { label: 'Leave',     data: items.map((i: any) => i.leave     ?? 0), backgroundColor: '#F59E0B', borderRadius: 0, stack: 'A', borderSkipped: false },
-        { label: 'PMO',       data: items.map((i: any) => i.pmo       ?? 0), backgroundColor: '#8B5CF6', borderRadius: 0, stack: 'A', borderSkipped: false },
       ]
     };
   });
@@ -1906,10 +1913,10 @@ export class DashboardComponent implements OnInit {
     const s = this.summary();
     if (!s) return null;
     return {
-      labels: ['Billable', 'Internal', 'Leave', 'PMO'],
+      labels: ['Billable'],
       datasets: [{
-        data: [s.billable_hours, s.internal_hours, s.leave_hours, s.pmo_hours],
-        backgroundColor: ['#16A34A', '#3B82F6', '#F59E0B', '#8B5CF6'],
+        data: [s.billable_hours],
+        backgroundColor: ['#16A34A'],
         borderWidth: 0,
         hoverOffset: 8,
       }]
@@ -1922,9 +1929,6 @@ export class DashboardComponent implements OnInit {
     const total = s.total_hours || 1;
     return [
       { label: 'Billable',  hours: s.billable_hours,  pct: +((s.billable_hours  / total) * 100).toFixed(1), color: '#16A34A' },
-      { label: 'Internal',  hours: s.internal_hours,  pct: +((s.internal_hours  / total) * 100).toFixed(1), color: '#3B82F6' },
-      { label: 'Leave',     hours: s.leave_hours,     pct: +((s.leave_hours     / total) * 100).toFixed(1), color: '#F59E0B' },
-      { label: 'PMO',       hours: s.pmo_hours,       pct: +((s.pmo_hours       / total) * 100).toFixed(1), color: '#8B5CF6' },
     ];
   });
 
