@@ -956,6 +956,7 @@ import { AuthenticationService } from '../service/authentication.service';
       border-radius: var(--radius-lg);
       padding: 1.25rem;
       box-shadow: var(--shadow-sm);
+      min-width: 0;
     }
     .card-header {
       display: flex;
@@ -1004,7 +1005,8 @@ import { AuthenticationService } from '../service/authentication.service';
       font-weight: 700;
       box-shadow: var(--shadow-sm);
     }
-    .chart-area { }
+    .chart-area { width: 100%; max-width: 100%; overflow: hidden; }
+    ::ng-deep .chart-area canvas, ::ng-deep .donut-chart-wrap canvas { max-width: 100% !important; }
     .chart-skel-wrap { }
     .empty-chart {
       height: 260px;
@@ -1032,6 +1034,9 @@ import { AuthenticationService } from '../service/authentication.service';
       display: flex;
       justify-content: center;
       align-items: center;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
     }
     .donut-center {
       position: absolute;
