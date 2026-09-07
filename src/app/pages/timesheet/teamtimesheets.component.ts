@@ -136,6 +136,7 @@ interface TeamResponse {
         <button class="clear-filter-btn" (click)="clearFilter()">Clear filter</button>
       </div>
     } @else {
+      <div class="table-scroll">
       <table class="team-table">
         <thead>
           <tr>
@@ -188,7 +189,7 @@ interface TeamResponse {
                 @if (item.timesheet?.entries?.length) {
                   <div class="proj-chips">
                     @for (e of item.timesheet.entries.slice(0, 3); track e.project_name) {
-                      <span class="proj-chip">{{ e.project_name }}</span>
+                      <span class="proj-chip" [pTooltip]="e.project_name" tooltipPosition="top">{{ e.project_name }}</span>
                     }
                     @if (item.timesheet.entries.length > 3) {
                       <span class="proj-chip more">+{{ item.timesheet.entries.length - 3 }} more</span>
@@ -230,6 +231,7 @@ interface TeamResponse {
           }
         </tbody>
       </table>
+      </div>
     }
   </div>
 
@@ -442,6 +444,7 @@ interface TeamResponse {
 
     /* Table card */
     .team-table-card { background: white; border: 1px solid #E5E7EB; border-radius: 16px; overflow: hidden; }
+    .table-scroll { overflow-x: auto; }
     .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0.875rem 1.25rem; border-bottom: 1px solid #F3F4F6; flex-wrap: wrap; gap: 0.5rem; }
     .tb-info { font-size: 0.82rem; color: #6B7280; }
     .bulk-approve-btn { background: #16A34A; color: white; border: none; border-radius: 8px; padding: 0.45rem 1rem; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: background 0.15s; }
@@ -485,7 +488,7 @@ interface TeamResponse {
     .no-ts { color: #D1D5DB; font-size: 0.82rem; }
 
     .proj-chips { display: flex; flex-wrap: wrap; gap: 3px; }
-    .proj-chip { font-size: 0.68rem; background: #EEF2FF; color: #4338CA; padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
+    .proj-chip { font-size: 0.68rem; background: #EEF2FF; color: #4338CA; padding: 2px 7px; border-radius: 10px; white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; display: inline-block; vertical-align: middle; }
     .proj-chip.more { background: #F3F4F6; color: #6B7280; }
 
     .action-btns { display: flex; align-items: center; gap: 4px; justify-content: center; }

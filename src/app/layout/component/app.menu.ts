@@ -86,8 +86,7 @@ export class AppMenu implements OnInit {
             label: 'Manager',
             icon: 'pi pi-fw pi-briefcase',
             items: [
-                
-                
+                { label: 'My Team', icon: 'pi pi-fw pi-users', routerLink: ['/app/pages/manageusers'] },
                 { label: 'Manage Projects', icon: 'pi pi-fw pi-folder', routerLink: ['/app/pages/manage-projects'] },
                 { label: 'Project Allocations', icon: 'pi pi-fw pi-user-plus', routerLink: ['/app/pages/project-allocations'] },
                 { label: 'Validate Timesheets', icon: 'pi pi-fw pi-users', routerLink: ['/app/pages/team'] },
@@ -118,7 +117,7 @@ export class AppMenu implements OnInit {
     ngOnInit() {
         this.authenticationService.user.subscribe(user => {
             this.user = user;
-            if (user?.type === 'Superadmin') {
+            if (user?.type === 'Superadmin' || user?.type === 'BUH') {
                 this.display_menu = this.admin_menu;
             } else if (user?.type === 'manager') {
                 this.display_menu = this.manager_menu;

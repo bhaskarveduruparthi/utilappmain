@@ -149,6 +149,7 @@ interface ExportColumn { title: string; dataKey: string; }
             text-transform: uppercase; letter-spacing: 0.04em;
         }
         .type-superadmin { background: #FEE2E2; color: #991B1B; }
+        .type-buh        { background: #EDE9FE; color: #5B21B6; }
         .type-manager    { background: #FEF3C7; color: #92400E; }
         .type-user       { background: #DCFCE7; color: #166534; }
         .type-default    { background: #F1F5F9; color: #475569; }
@@ -264,8 +265,10 @@ interface ExportColumn { title: string; dataKey: string; }
     <!-- ── Page Header ── -->
     <div class="page-header">
         <div>
-            <h1 class="page-title">Employee Master</h1>
-            <span class="page-sub">Manage all users, roles and business unit assignments</span>
+            <h1 class="page-title">{{ isManagerRole ? 'My Team' : 'Employee Master' }}</h1>
+            <span class="page-sub">
+                {{ isManagerRole ? 'Users who report to you (by IRM)' : 'Manage all users, roles and business unit assignments' }}
+            </span>
         </div>
         <div class="toolbar-wrap">
             <!-- Search -->
@@ -285,9 +288,11 @@ interface ExportColumn { title: string; dataKey: string; }
                     <i class="pi pi-th-large"></i>
                 </button>
             </div>
-            <button class="btn-primary" (click)="openNew()">
-                <i class="pi pi-plus"></i> Add User
-            </button>
+            @if (isAdminRole) {
+                <button class="btn-primary" (click)="openNew()">
+                    <i class="pi pi-plus"></i> Add User
+                </button>
+            }
             <button class="btn-secondary" (click)="exportCSV()">
                 <i class="pi pi-download"></i> Export Excel
             </button>
@@ -353,14 +358,18 @@ interface ExportColumn { title: string; dataKey: string; }
                                         </span>
                                     </td>
                                     <td>
-                                        <div class="row-actions">
-                                            <button class="row-btn row-btn-edit" (click)="editUser(u)" title="Edit">
-                                                <i class="pi pi-pencil"></i>
-                                            </button>
-                                            <button class="row-btn row-btn-del" (click)="deleteUser(u)" title="Delete">
-                                                <i class="pi pi-trash"></i>
-                                            </button>
-                                        </div>
+                                        @if (isAdminRole) {
+                                            <div class="row-actions">
+                                                <button class="row-btn row-btn-edit" (click)="editUser(u)" title="Edit">
+                                                    <i class="pi pi-pencil"></i>
+                                                </button>
+                                                <button class="row-btn row-btn-del" (click)="deleteUser(u)" title="Delete">
+                                                    <i class="pi pi-trash"></i>
+                                                </button>
+                                            </div>
+                                        } @else {
+                                            <span style="color:#94A3B8; font-size:0.78rem;">View only</span>
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -427,16 +436,18 @@ interface ExportColumn { title: string; dataKey: string; }
                                     <span><strong>IRM:</strong> {{ u.irm }}</span>
                                 </div>
                             }
-                            <hr class="uc-divider" />
-                            <!-- Actions -->
-                            <div class="uc-actions">
-                                <button class="uca-edit" (click)="editUser(u)">
-                                    <i class="pi pi-pencil"></i> Edit
-                                </button>
-                                <button class="uca-del" (click)="deleteUser(u)">
-                                    <i class="pi pi-trash"></i> Delete
-                                </button>
-                            </div>
+                            @if (isAdminRole) {
+                                <hr class="uc-divider" />
+                                <!-- Actions -->
+                                <div class="uc-actions">
+                                    <button class="uca-edit" (click)="editUser(u)">
+                                        <i class="pi pi-pencil"></i> Edit
+                                    </button>
+                                    <button class="uca-del" (click)="deleteUser(u)">
+                                        <i class="pi pi-trash"></i> Delete
+                                    </button>
+                                </div>
+                            }
                         </div>
                     }
                 </div>
@@ -624,6 +635,8 @@ export class ManageUsers implements OnInit {
     searchTerm         = '';
     loading            = true;
     isvalid            = false;
+    isAdminRole        = false;
+    isManagerRole      = false;
     viewMode: 'table' | 'card' = 'table';
 
     userDialog         = false;
@@ -638,7 +651,8 @@ export class ManageUsers implements OnInit {
 
     userTypes = [
         { label: 'User',    value: 'user'    },
-        { label: 'Manager', value: 'manager' }
+        { label: 'Manager', value: 'manager' },
+        { label: 'BUH',     value: 'BUH'     }
     ];
     filteredTypes: any[] = [];
 
@@ -663,8 +677,17 @@ export class ManageUsers implements OnInit {
         public  router: Router
     ) {
         this.authservice.user.subscribe(x => {
-            if (x?.type === 'Superadmin') {
+            if (x?.type === 'Superadmin' || x?.type === 'BUH') {
                 this.isvalid = true;
+                this.isAdminRole = true;
+                this.isManagerRole = false;
+            } else if (x?.type === 'manager') {
+                // Managers get a read-only "My Team" view, scoped
+                // server-side to users whose IRM is this manager - see
+                // GET /users/getallusers. They cannot add/edit/delete.
+                this.isvalid = true;
+                this.isAdminRole = false;
+                this.isManagerRole = true;
             } else {
                 this.router.navigate(['/auth/access']);
             }
@@ -727,6 +750,7 @@ export class ManageUsers implements OnInit {
         if (!type) return 'type-default type-pill';
         const t = type.toLowerCase();
         if (t === 'superadmin') return 'type-superadmin type-pill';
+        if (t === 'buh')        return 'type-buh type-pill';
         if (t === 'manager')    return 'type-manager type-pill';
         if (t === 'user')       return 'type-user type-pill';
         return 'type-default type-pill';

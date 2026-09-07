@@ -684,7 +684,7 @@ export class ManageCustomers implements OnInit {
         public  router: Router
     ) {
         this.authservice.user.subscribe(x => {
-            if (x?.type === 'Superadmin') {
+            if (x?.type === 'Superadmin' || x?.type === 'BUH') {
                 this.isvalid = true;
             } else if (x?.type === 'manager') {
                 this.isvalid = false;

@@ -1753,7 +1753,7 @@ export class DashboardComponent implements OnInit {
 
   isManagerOrAdmin(): boolean {
     const u = this.authService.userValue;
-    return !!(u?.type && ['Superadmin', 'manager', 'admin'].includes(u.type));
+    return !!(u?.type && ['Superadmin', 'BUH', 'manager', 'admin'].includes(u.type));
   }
 
   applyPreset(p: { key: string; label: string }) {

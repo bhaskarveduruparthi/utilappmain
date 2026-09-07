@@ -403,7 +403,7 @@ export class LoginHistory implements OnInit {
         public  router: Router
     ) {
         this.authservice.user.subscribe(x => {
-            if (x?.type === 'Superadmin') {
+            if (x?.type === 'Superadmin' || x?.type === 'BUH') {
                 this.isvalid = true;
             } else {
                 this.isvalid = false;

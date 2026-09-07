@@ -373,7 +373,7 @@ export class Login {
       this.isLoading = false;
       this.auth.userValue = data;
       localStorage.setItem('user', JSON.stringify(data));
-      if (data?.type == 'Superadmin') {
+      if (data?.type == 'Superadmin' || data?.type == 'BUH') {
         this.router.navigate(['/app']);
       } else if (data?.type == 'manager') {
         this.router.navigate(['/app/pages/team']);

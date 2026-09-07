@@ -17,6 +17,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { HttpClient } from '@angular/common/http';
 import { UrlService } from '../service/url.service';
+import { AuthenticationService } from '../service/authentication.service';
 import { Card } from "primeng/card";
  // ← adjust path if needed
 
@@ -28,6 +29,8 @@ interface Project {
   customer_name?: string;
   project_type: string;
   active: string;
+  created_by?: number | null;
+  created_by_name?: string | null;
 }
 
 interface Customer {
@@ -131,6 +134,11 @@ interface Customer {
           <th pSortableColumn="project_type" style="width:130px">
             Type <p-sortIcon field="project_type" />
           </th>
+          @if (isAdminRole()) {
+            <th pSortableColumn="created_by_name" style="width:150px">
+              Created By <p-sortIcon field="created_by_name" />
+            </th>
+          }
           <th style="width:90px; text-align:center">Active</th>
           <th style="width:110px; text-align:center">Actions</th>
         </tr>
@@ -154,6 +162,11 @@ interface Customer {
               {{ project.project_type }}
             </span>
           </td>
+          @if (isAdminRole()) {
+            <td>
+              <span class="creator-name">{{ project.created_by_name || '—' }}</span>
+            </td>
+          }
           <td style="text-align:center">
             <p-toggleswitch
               [ngModel]="project.active === 'Y'"
@@ -177,7 +190,7 @@ interface Customer {
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="6">
+          <td [attr.colspan]="isAdminRole() ? 7 : 6">
             <div class="empty-state">
               <i class="pi pi-briefcase empty-icon"></i>
               <p>No projects found</p>
@@ -329,6 +342,7 @@ interface Customer {
     }
     .proj-name { font-weight: 600; color: #111827; font-size: 1rem; }
     .customer-name { font-size: 0.95rem; color: #374151; }
+    .creator-name { font-size: 0.9rem; color: #4B5563; }
 
     .type-pill {
       font-size: 0.7rem; font-weight: 700; padding: 3px 10px;
@@ -404,6 +418,13 @@ export class ManageProjectsComponent implements OnInit {
   editingId: number | null = null;
   private apiBase: string;  // ← computed once from UrlService
 
+  // Superadmin/BUH manage every manager's projects, so a "Created By"
+  // column helps them tell projects apart by owner. A manager's own list
+  // is always their own projects (server-side scoped - see
+  // role_utils.can_access_project/project_owner_filter), so the column
+  // would just repeat their own name on every row and is hidden for them.
+  isAdminRole = signal(false);
+
   projectForm: FormGroup;
 
   constructor(
@@ -412,9 +433,13 @@ export class ManageProjectsComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private urlService: UrlService,             // ← injected
+    private authenticationService: AuthenticationService,
   ) {
     // getApiUrl() returns "protocol://host/" — strip the trailing slash
     this.apiBase = this.urlService.getApiUrl().replace(/\/$/, '');
+
+    const currentUser = this.authenticationService.userValue;
+    this.isAdminRole.set(currentUser?.type === 'Superadmin' || currentUser?.type === 'BUH');
 
     this.projectForm = this.fb.group({
       project_code: ['', [Validators.required, Validators.maxLength(50)]],
