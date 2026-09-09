@@ -83,13 +83,7 @@ interface TimesheetRow {
       </div>
     </div>
 
-    <div class="ts-meta-card">
-      <div class="ts-meta-icon holiday-icon"><i class="pi pi-sun"></i></div>
-      <div>
-        <div class="ts-meta-label">Holidays</div>
-        <div class="ts-meta-value">0 hr</div>
-      </div>
-    </div>
+    
   </div>
 
   <!-- Status Banners -->
@@ -97,7 +91,7 @@ interface TimesheetRow {
     <div class="banner info-banner">
       <i class="pi pi-send banner-icon"></i>
       <div>
-        <div class="banner-title">Timesheet submitted successfully</div>
+        <div class="banner-title">Billable effort submitted successfully</div>
         <div class="banner-sub">Sent to <strong>{{ approverName() }}</strong> for approval. You can view the details below (read-only).</div>
       </div>
     </div>
@@ -106,8 +100,8 @@ interface TimesheetRow {
     <div class="banner success-banner">
       <i class="pi pi-verified banner-icon"></i>
       <div>
-        <div class="banner-title">Timesheet approved by {{ approverName() }}</div>
-        <div class="banner-sub">Your timesheet is finalized.</div>
+        <div class="banner-title">Billable effort approved by {{ approverName() }}</div>
+        <div class="banner-sub">Your billable effort is finalized.</div>
       </div>
     </div>
   }
@@ -115,7 +109,7 @@ interface TimesheetRow {
     <div class="banner danger-banner">
       <i class="pi pi-times-circle banner-icon"></i>
       <div>
-        <div class="banner-title">Timesheet rejected — please correct and resubmit</div>
+        <div class="banner-title">Billable effort rejected — please correct and resubmit</div>
         <div class="banner-sub">{{ rejectionRemarks() }}</div>
       </div>
     </div>
@@ -124,7 +118,7 @@ interface TimesheetRow {
   <!-- Timesheet Table -->
   <div class="ts-table-card">
     <div class="ts-table-header">
-      <span class="ts-table-title">Timesheet</span>
+      <span class="ts-table-title">Billable Effort (Fill in only Customer Approved Billable Efforts)</span>
       <div class="ts-header-right">
         @if (isLocked()) {
           <span class="readonly-badge"><i class="pi pi-lock"></i> Read-only</span>
@@ -488,8 +482,8 @@ nextWeek() {
   }
 
   loadProjects() {
-    // Only projects assigned (and currently active) for this user, plus non-Billable
-    // projects which stay open to everyone — see /timesheet/my-projects on the backend.
+    // Every active project is visible to every user here (2026-09-09) —
+    // see /timesheet/my-projects on the backend.
     this.tsService.getMyTimesheetProjects().subscribe({
       next: (projects) => {
         this.projectOptions = projects.map((p: any) => ({ label: p.project_name, value: p.id, type: p.project_type }));

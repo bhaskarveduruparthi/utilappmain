@@ -48,8 +48,8 @@ interface TimesheetSummary {
   <!-- Header -->
   <div class="hist-header">
     <div>
-      <h2 class="hist-title">My Timesheet History</h2>
-      <span class="hist-sub">View and track all your submitted timesheets</span>
+      <h2 class="hist-title">My Billable Effort History</h2>
+      <span class="hist-sub">View and track all your submitted billable efforts</span>
     </div>
     <div class="hist-controls">
       <p-select [options]="yearOptions" [(ngModel)]="selectedYear"

@@ -299,9 +299,9 @@ import { AuthenticationService } from '../service/authentication.service';
                 <button class="btn-primary" (click)="openNew()">
                     <i class="pi pi-plus"></i> Add Customer
                 </button>
-                <button class="btn-secondary" (click)="openUploadDialog()">
+                <!--<button class="btn-secondary" (click)="openUploadDialog()">
                     <i class="pi pi-upload"></i> Bulk Upload
-                </button>
+                </button>-->
                 <button class="btn-success" (click)="downloadExcel()">
                     <i class="pi pi-download"></i> Export Excel
                 </button>
@@ -333,7 +333,7 @@ import { AuthenticationService } from '../service/authentication.service';
                         <th>YASH Billing Entity</th>
                         <th>BDL Name</th>
                         <th>BDL ID</th>
-                        <th>Created By</th>
+                        
                         <th>Status</th>
                         @if (isvalid) { <th>Actions</th> }
                     </tr>
@@ -367,7 +367,7 @@ import { AuthenticationService } from '../service/authentication.service';
                                 <td>{{ c.yash_billing_entity || '—' }}</td>
                                 <td>{{ c.business_development_lead || '—' }}</td>
                                 <td>{{ c.business_development_lead_id || '—' }}</td>
-                                <td>{{ c.irm_user_id || '—' }}</td>
+                                
                                 <td>
                                     <span class="status-pill" [class]="statusClass(c.customer_status)">
                                         {{ c.customer_status || '—' }}

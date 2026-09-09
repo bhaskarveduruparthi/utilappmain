@@ -74,17 +74,14 @@ import { CommonModule } from '@angular/common';
 
     .logo { display: flex; align-items: center; gap: 14px; }
     .logo-icon {
-      width: 42px; height: 42px;
-      border: 1.5px solid rgba(241,180,52,0.6);
-      border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      position: relative; overflow: hidden;
     }
-    .logo-icon::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(241,180,52,0.15) 0%, transparent 60%);
+    .logo-icon img {
+      height: 72px;
+      width: auto;
+      object-fit: contain;
+      display: block;
     }
-    .logo-icon svg { width: 22px; height: 22px; }
     .logo-text { display: flex; flex-direction: column; gap: 1px; }
     .logo-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.15rem; color: #f0f4ff; letter-spacing: -0.01em; line-height: 1; }
     .logo-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; color: rgba(241,180,52,0.7); letter-spacing: 0.12em; text-transform: uppercase; }
@@ -199,13 +196,10 @@ import { CommonModule } from '@angular/common';
       <div class="left-panel">
         <div class="logo">
           <div class="logo-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#f1b434" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 18L9 12L13 16L21 7"/>
-              <path d="M16 7h5v5"/>
-            </svg>
+            <img src="/yash-logo.png" alt="Yash Technologies" />
           </div>
           <div class="logo-text">
-            <span class="logo-name">Utilization Ratio</span>
+            <span class="logo-name">Resource Utilization Tracker</span>
           
           </div>
         </div>
@@ -221,8 +215,7 @@ import { CommonModule } from '@angular/common';
             Performance.
           </h1>
           <p class="hero-desc">
-            Real-time visibility into team utilization, project allocation,
-            and capacity — so you can make decisions backed by data.
+            
           </p>
           
         </div>
@@ -237,7 +230,7 @@ import { CommonModule } from '@angular/common';
           <div class="sep"></div>
           <div class="badge">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Updated Daily
+            Updated Weekly
           </div>
         </div>
       </div>
@@ -376,10 +369,10 @@ export class Login {
       if (data?.type == 'Superadmin' || data?.type == 'BUH') {
         this.router.navigate(['/app']);
       } else if (data?.type == 'manager') {
-        this.router.navigate(['/app/pages/team']);
+        this.router.navigate(['/app']);
       }
       else{
-        this.router.navigate(['/app/pages/timesheet']);
+        this.router.navigate(['/app']);
       }
     });
   }

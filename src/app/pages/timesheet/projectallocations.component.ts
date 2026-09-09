@@ -172,11 +172,13 @@ interface Allocation {
                       (click)="confirmEndNow(a)">
                     </button>
                   }
-                  <button pButton icon="pi pi-trash"
-                    class="p-button-text p-button-sm p-button-rounded p-button-danger delete-btn"
-                    pTooltip="Remove" tooltipPosition="top"
-                    (click)="confirmDelete(a)">
-                  </button>
+                  @if (removeAllocationEnabled) {
+                    <button pButton icon="pi pi-trash"
+                      class="p-button-text p-button-sm p-button-rounded p-button-danger delete-btn"
+                      pTooltip="Remove" tooltipPosition="top"
+                      (click)="confirmDelete(a)">
+                    </button>
+                  }
                 </td>
               </tr>
             </ng-template>
@@ -375,6 +377,12 @@ interface Allocation {
   `]
 })
 export class ProjectAllocationsComponent implements OnInit {
+  // Disabled 2026-09-09: "Remove Project Allocation" is turned off in the
+  // UI (flip to re-enable; the backend has a matching
+  // REMOVE_PROJECT_ALLOCATION_ENABLED flag in timesheet_views.py that
+  // must also be flipped for the action to actually work end-to-end).
+  removeAllocationEnabled = false;
+
   loading = signal(false);
   saving = signal(false);
   editMode = signal(false);
@@ -565,6 +573,9 @@ export class ProjectAllocationsComponent implements OnInit {
   }
 
   confirmDelete(a: Allocation) {
+    if (!this.removeAllocationEnabled) {
+      return;
+    }
     this.confirmationService.confirm({
       message: `Remove <strong>${a.user_name}</strong>'s allocation to <strong>${a.project_name}</strong> entirely? This cannot be undone.`,
       header: 'Confirm Remove',

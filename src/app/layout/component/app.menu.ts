@@ -28,7 +28,7 @@ export class AppMenu implements OnInit {
             ]
         },
         {
-            label: 'Admin',
+            label: 'SuperAdmin/BUH',
             icon: 'pi pi-fw pi-briefcase',
             items: [
                 { label: 'Employee Master', icon: 'pi pi-fw pi-users', routerLink: ['/app/pages/manageusers'] },
@@ -37,21 +37,19 @@ export class AppMenu implements OnInit {
             ]
         },
         {
-            label: 'Timesheet',
+            label: 'Billable',
             icon: 'pi pi-fw pi-calendar',
             items: [
                 { label: 'Manage Projects', icon: 'pi pi-fw pi-folder', routerLink: ['/app/pages/manage-projects'] },
-                { label: 'Project Allocations', icon: 'pi pi-fw pi-user-plus', routerLink: ['/app/pages/project-allocations'] },
-                { label: 'Validate Timesheets', icon: 'pi pi-fw pi-users', routerLink: ['/app/pages/team'] },
-                { label: 'Submit Timesheet', icon: 'pi pi-fw pi-plus', routerLink: ['/app/pages/timesheet'] },
-                { label: 'Timesheet History', icon: 'pi pi-fw pi-clock', routerLink: ['/app/pages/timesheet/history'] }
+                /*{ label: 'Project Allocations', icon: 'pi pi-fw pi-user-plus', routerLink: ['/app/pages/project-allocations'] },*/
+                { label: 'Validate Billable Efforts', icon: 'pi pi-fw pi-users', routerLink: ['/app/pages/team'] }
             ]
         },
         {
             label: 'Reports',
             icon: 'pi pi-fw pi-file',
             items: [
-                { label: 'Utilization Reports', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/app/pages/reports'] }
+                { label: 'Utilization Report', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/app/pages/reports'] }
             ]
         },
         {
@@ -63,13 +61,25 @@ export class AppMenu implements OnInit {
     ];
 
     user_menu: MenuItem[] = [
-        
         {
-            label: 'Timesheet',
+            label: 'Home',
+            items: [
+                { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/app'] }
+            ]
+        },
+        {
+            label: 'Billable Effort',
             icon: 'pi pi-fw pi-calendar',
             items: [
-                { label: 'Submit Timesheet', icon: 'pi pi-fw pi-plus', routerLink: ['/app/pages/timesheet'] },
-                { label: 'Timesheet History', icon: 'pi pi-fw pi-clock', routerLink: ['/app/pages/timesheet/history'] }
+                { label: 'Submit Billable Effort', icon: 'pi pi-fw pi-plus', routerLink: ['/app/pages/timesheet'] },
+                { label: 'Submitted Efforts History', icon: 'pi pi-fw pi-clock', routerLink: ['/app/pages/timesheet/history'] }
+            ]
+        },
+        {
+            label: 'Reports',
+            icon: 'pi pi-fw pi-file',
+            items: [
+                { label: 'Utilization Report', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/app/pages/reports'] }
             ]
         },
         
@@ -87,24 +97,25 @@ export class AppMenu implements OnInit {
             icon: 'pi pi-fw pi-briefcase',
             items: [
                 { label: 'My Team', icon: 'pi pi-fw pi-users', routerLink: ['/app/pages/manageusers'] },
-                { label: 'Manage Projects', icon: 'pi pi-fw pi-folder', routerLink: ['/app/pages/manage-projects'] },
-                { label: 'Project Allocations', icon: 'pi pi-fw pi-user-plus', routerLink: ['/app/pages/project-allocations'] },
-                { label: 'Validate Timesheets', icon: 'pi pi-fw pi-users', routerLink: ['/app/pages/team'] },
+                /*{ label: 'Manage Projects', icon: 'pi pi-fw pi-folder', routerLink: ['/app/pages/manage-projects'] },
+                /*{ label: 'Project Allocations', icon: 'pi pi-fw pi-user-plus', routerLink: ['/app/pages/project-allocations'] },*/
+                
             ]
         },
         {
-            label: 'Timesheet',
+            label: 'Billable',
             icon: 'pi pi-fw pi-calendar',
             items: [
-                { label: 'Submit Timesheet', icon: 'pi pi-fw pi-plus', routerLink: ['/app/pages/timesheet'] },
-                { label: 'Timesheet History', icon: 'pi pi-fw pi-clock', routerLink: ['/app/pages/timesheet/history'] }
+                { label: 'Validate Billable Efforts', icon: 'pi pi-fw pi-users', routerLink: ['/app/pages/team'] },
+                { label: 'Submit Billable Effort', icon: 'pi pi-fw pi-plus', routerLink: ['/app/pages/timesheet'] },
+                { label: 'Submitted Efforts History', icon: 'pi pi-fw pi-clock', routerLink: ['/app/pages/timesheet/history'] }
             ]
         },
         {
             label: 'Reports',
             icon: 'pi pi-fw pi-file',
             items: [
-                { label: 'Utilization Reports', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/app/pages/reports'] }
+                { label: 'Utilization Report', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/app/pages/reports'] }
             ]
         }
     ];

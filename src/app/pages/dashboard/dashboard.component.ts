@@ -18,6 +18,7 @@ import { ChartModule } from 'primeng/chart';
 import { MessageService } from 'primeng/api';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { CardModule } from 'primeng/card';
+import { PaginatorModule } from 'primeng/paginator';
 
 import { DashboardService } from '../service/dashboard.service';
 import { AuthenticationService } from '../service/authentication.service';
@@ -31,6 +32,7 @@ import { AuthenticationService } from '../service/authentication.service';
     SelectModule, ButtonModule, TableModule, TagModule,
     TooltipModule, SkeletonModule, ToastModule, TabsModule,
     DatePickerModule, ChartModule, ProgressBarModule, CardModule,
+    PaginatorModule,
   ],
   providers: [MessageService],
   template: `
@@ -66,8 +68,10 @@ import { AuthenticationService } from '../service/authentication.service';
             (ngModelChange)="onCustomRange()" />
         </div>
       }
-      <p-select [options]="yearOptions" [(ngModel)]="selectedYear"
-        (ngModelChange)="onYearChange()" styleClass="year-sel" />
+      @if (activePeriod() === 'ytd') {
+        <p-select [options]="yearOptions" [(ngModel)]="selectedYear"
+          (ngModelChange)="onYearChange()" styleClass="year-sel" />
+      }
       <button class="refresh-btn" (click)="loadAll()" [class.spinning]="anyLoading()"
         pTooltip="Refresh data" tooltipPosition="bottom">
         <i class="pi pi-refresh"></i>
@@ -463,7 +467,7 @@ import { AuthenticationService } from '../service/authentication.service';
                 </tr>
               </thead>
               <tbody>
-                @for (r of filteredResources(); track r.user_id) {
+                @for (r of pagedResources(); track r.user_id) {
                   <tr>
                     <td><code class="emp-id">{{ r.yash_id }}</code></td>
                     <td>
@@ -500,6 +504,15 @@ import { AuthenticationService } from '../service/authentication.service';
                 }
               </tbody>
             </table>
+          </div>
+          <div class="paginator-wrap">
+            <p-paginator
+              [totalRecords]="filteredResources().length"
+              [rows]="resourceRows()"
+              [first]="resourceFirst()"
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} resources"
+              [showCurrentPageReport]="true"
+              (onPageChange)="onResourcePageChange($event)" />
           </div>
         }
       </p-tabpanel>
@@ -1400,6 +1413,11 @@ import { AuthenticationService } from '../service/authentication.service';
       border-radius: var(--radius-md);
       border: 1px solid var(--slate-200);
     }
+    .paginator-wrap {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0.65rem 0.25rem 0 0.25rem;
+    }
     .res-table { width: 100%; border-collapse: collapse; font-size: 0.81rem; }
     .res-table thead th {
       background: var(--slate-50);
@@ -1660,6 +1678,13 @@ export class DashboardComponent implements OnInit {
   summary           = signal<any>(null);
   resourceData      = signal<any[]>([]);
   filteredResources = signal<any[]>([]);
+  resourceFirst     = signal(0);
+  resourceRows      = signal(10);
+  pagedResources     = computed(() => {
+    const first = this.resourceFirst();
+    const rows  = this.resourceRows();
+    return this.filteredResources().slice(first, first + rows);
+  });
   trendData         = signal<any>(null);
   complianceData    = signal<any>(null);
   managerData       = signal<any[]>([]);
@@ -1735,7 +1760,9 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.applyPreset(this.periodPresets.find(p => p.key === 'ytd')!);
+    // Managers/BUH/Superadmin land on Month-to-Date; plain Users land on This Week.
+    const defaultKey = this.isManagerOrAdmin() ? 'this_month' : 'this_week';
+    this.applyPreset(this.periodPresets.find(p => p.key === defaultKey)!);
   }
 
   // Local Y/M/D formatting (NOT toISOString) — toISOString() converts to UTC first,
@@ -1774,6 +1801,10 @@ export class DashboardComponent implements OnInit {
       const q = Math.floor(m / 3);
       this.fromDate = new Date(y, q * 3, 1); this.toDate = new Date(y, q * 3 + 3, 0);
     } else if (p.key === 'ytd') {
+      // Clicking the YTD preset fresh always means "this year to date" —
+      // reset selectedYear so a previously-picked past year doesn't linger
+      // (the year dropdown itself is only shown while activePeriod === 'ytd').
+      this.selectedYear = y;
       this.fromDate = new Date(y, 0, 1);     this.toDate = today;
     } else {
       return;
@@ -1782,7 +1813,21 @@ export class DashboardComponent implements OnInit {
   }
 
   onCustomRange()  { if (this.fromDate && this.toDate) this.loadAll(); }
-  onYearChange()   { this.loadAll(); }
+
+  onYearChange() {
+    // The backend only falls back to `year` when from_date/to_date are absent
+    // (see dashboard.py's `if not from_date: from_date = date(year, 1, 1)`),
+    // and applyPreset('ytd') always sets fromDate/toDate before this can run.
+    // So picking a different year here must also recompute fromDate/toDate —
+    // otherwise the request still carries the old year's dates and the
+    // (ignored) new `year` param, and the dashboard silently keeps showing
+    // the previously-selected year's data.
+    const y = this.selectedYear;
+    const today = new Date();
+    this.fromDate = new Date(y, 0, 1);
+    this.toDate   = (y === today.getFullYear()) ? today : new Date(y, 11, 31);
+    this.loadAll();
+  }
 
   loadAll() {
     this.loadSummary();
@@ -1802,7 +1847,7 @@ export class DashboardComponent implements OnInit {
   }
 
   loadSummary()    { this.summaryLoading.set(true);    this.dashService.getSummary(this.activeFilters).subscribe(this.handle(this.summaryLoading, this.summary)); }
-  loadResources()  { this.resourceLoading.set(true);   this.dashService.getByResource(this.activeFilters).subscribe({ next: (d: any[]) => { this.resourceData.set(d); this.filteredResources.set(d); this.sortResources(); this.resourceLoading.set(false); this.cdr.markForCheck(); }, error: () => this.resourceLoading.set(false) }); }
+  loadResources()  { this.resourceLoading.set(true);   this.dashService.getByResource(this.activeFilters).subscribe({ next: (d: any[]) => { this.resourceData.set(d); this.filteredResources.set(d); this.resourceFirst.set(0); this.sortResources(); this.resourceLoading.set(false); this.cdr.markForCheck(); }, error: () => this.resourceLoading.set(false) }); }
   loadCompliance() { this.complianceLoading.set(true); this.dashService.getSubmissionCompliance(8).subscribe(this.handle(this.complianceLoading, this.complianceData)); }
   loadManagers()   { this.managerLoading.set(true);    this.dashService.getByManager(this.activeFilters).subscribe(this.handle(this.managerLoading, this.managerData)); }
   loadBU()         { this.buLoading.set(true);         this.dashService.getByBusinessUnit(this.activeFilters).subscribe(this.handle(this.buLoading, this.buData)); }
@@ -1854,6 +1899,7 @@ export class DashboardComponent implements OnInit {
           (r.irm    || '').toLowerCase().includes(term))
       : [...this.resourceData()];
     this.filteredResources.set(filtered);
+    this.resourceFirst.set(0);
     this.sortResources();
   }
 
@@ -1871,6 +1917,8 @@ export class DashboardComponent implements OnInit {
       return s;
     });
   }
+
+  onResourcePageChange(event: any) { this.resourceFirst.set(event.first); this.resourceRows.set(event.rows); }
 
   initials(name: string)        { return (name || '').split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2); }
   managerInitials(name: string) { return this.initials(name); }

@@ -64,8 +64,10 @@ interface Customer {
       <h2 class="mp-title">Manage Projects</h2>
       <span class="mp-sub">Configure billable and internal projects for timesheet allocation</span>
     </div>
-    <button pButton label="Add Project" icon="pi pi-plus"
-      class="add-btn" (click)="openCreate()"></button>
+    @if (projectCreationEnabled) {
+      <button pButton label="Add Project" icon="pi pi-plus"
+        class="add-btn" (click)="openCreate()"></button>
+    }
   </div>
 
   <!-- Stats bar -->
@@ -134,11 +136,11 @@ interface Customer {
           <th pSortableColumn="project_type" style="width:130px">
             Type <p-sortIcon field="project_type" />
           </th>
-          @if (isAdminRole()) {
+          <!--@if (isAdminRole()) {
             <th pSortableColumn="created_by_name" style="width:150px">
               Created By <p-sortIcon field="created_by_name" />
             </th>
-          }
+          }-->
           <th style="width:90px; text-align:center">Active</th>
           <th style="width:110px; text-align:center">Actions</th>
         </tr>
@@ -162,11 +164,11 @@ interface Customer {
               {{ project.project_type }}
             </span>
           </td>
-          @if (isAdminRole()) {
+          <!--@if (isAdminRole()) {
             <td>
               <span class="creator-name">{{ project.created_by_name || '—' }}</span>
             </td>
-          }
+          }-->
           <td style="text-align:center">
             <p-toggleswitch
               [ngModel]="project.active === 'Y'"
@@ -194,8 +196,10 @@ interface Customer {
             <div class="empty-state">
               <i class="pi pi-briefcase empty-icon"></i>
               <p>No projects found</p>
-              <button pButton label="Add First Project" icon="pi pi-plus"
-                class="p-button-outlined p-button-sm" (click)="openCreate()"></button>
+              @if (projectCreationEnabled) {
+                <button pButton label="Add First Project" icon="pi pi-plus"
+                  class="p-button-outlined p-button-sm" (click)="openCreate()"></button>
+              }
             </div>
           </td>
         </tr>
@@ -389,6 +393,13 @@ interface Customer {
   `]
 })
 export class ManageProjectsComponent implements OnInit {
+  // Disabled 2026-09-09: "Project Creation" is turned off in the UI
+  // (flip to re-enable; the backend has a matching
+  // PROJECT_CREATION_ENABLED flag in timesheet_views.py that must also
+  // be flipped for creation to actually work end-to-end). Editing and
+  // deactivating existing projects is unaffected.
+  projectCreationEnabled = false;
+
   loading = signal(false);
   saving = signal(false);
   editMode = signal(false);
@@ -505,6 +516,9 @@ export class ManageProjectsComponent implements OnInit {
   }
 
   openCreate() {
+    if (!this.projectCreationEnabled) {
+      return;
+    }
     this.editMode.set(false);
     this.editingId = null;
     this.projectForm.reset({ project_type: 'Billable' });

@@ -258,7 +258,7 @@ import { AuthenticationService } from '../service/authentication.service';
   <div class="rpt-page">
     <div class="page-header" style="margin-bottom:1.25rem;">
       <h1 class="page-title">Utilization Report</h1>
-      <p class="page-sub">Matches Weekly Utilization Report Excel — Customer wise · IRM Wise · Pivot · Resource wise</p>
+      <p class="page-sub">Resource utilization data across different time periods</p>
     </div>
 
     <p-tabs [(value)]="activeTab" (valueChange)="onTabChange($event)">
@@ -332,6 +332,10 @@ import { AuthenticationService } from '../service/authentication.service';
                   <p-tab value="1">IRM Wise</p-tab>
                   <p-tab value="2">Resource wise</p-tab>
                   <p-tab value="3">Project Breakdown</p-tab>
+                  @if (!isPlainUser) {
+                  <p-tab value="4">Utilisation Statistics</p-tab>
+                  <p-tab value="5">Non Filling</p-tab>
+                  }
                 </p-tablist>
                 <p-tabpanels>
 
@@ -523,6 +527,87 @@ import { AuthenticationService } from '../service/authentication.service';
                     </div>
                   </p-tabpanel>
 
+                  @if (!isPlainUser) {
+                  <p-tabpanel value="4">
+                    <div class="section-card">
+                      <div class="section-header">
+                        <span class="section-title">Utilisation Statistics — {{ weeklyData()!.week_label }}</span>
+                        <span class="section-sub">Resources below {{ weeklyData()!.utilization_threshold_pct || 60 }}% utilisation · {{ (weeklyData()!.utilization_stats || []).length }} flagged</span>
+                      </div>
+                      <div class="report-table-wrap">
+                        <table class="res-table">
+                          <thead>
+                            <tr>
+                              <th>Emp ID</th>
+                              <th>Name</th>
+                              <th>BU</th>
+                              <th style="background:#16A34A;">Total Hrs</th>
+                              <th>Scheduled Hrs</th>
+                              <th style="background:#0F2440;">Util %</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @if ((weeklyData()!.utilization_stats || []).length === 0) {
+                              <tr><td colspan="6" style="text-align:center; padding:2rem; color:#94A3B8;">No resources below threshold — everyone is well utilised.</td></tr>
+                            }
+                            @for (res of weeklyData()!.utilization_stats; track res.user_id) {
+                              <tr style="border-bottom:1px solid #F1F5F9;">
+                                <td><span class="emp-id-badge">{{ res.yash_id }}</span></td>
+                                <td>
+                                  <div class="emp-name">{{ res.user_name }}</div>
+                                  <div style="font-size:.7rem; color:#94A3B8;">{{ res.irm }}</div>
+                                </td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
+                                <td class="td-num has-val">{{ res.total_hours }}</td>
+                                <td class="td-num">{{ res.scheduled_hours }}</td>
+                                <td class="td-center"><span class="util-pct low">{{ res.utilization_pct }}%</span></td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </p-tabpanel>
+                  }
+
+                  @if (!isPlainUser) {
+                  <p-tabpanel value="5">
+                    <div class="section-card">
+                      <div class="section-header">
+                        <span class="section-title">Non Filling — {{ weeklyData()!.week_label }}</span>
+                        <span class="section-sub">Resources who have not submitted a timesheet for this period · {{ (weeklyData()!.non_filling || []).length }} resources</span>
+                      </div>
+                      <div class="report-table-wrap">
+                        <table class="res-table">
+                          <thead>
+                            <tr>
+                              <th>Emp ID</th>
+                              <th>Name</th>
+                              <th>BU</th>
+                              <th>IRM</th>
+                              <th>IRM Email</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @if ((weeklyData()!.non_filling || []).length === 0) {
+                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">Everyone has submitted their timesheet for this period.</td></tr>
+                            }
+                            @for (res of weeklyData()!.non_filling; track res.user_id) {
+                              <tr style="border-bottom:1px solid #F1F5F9;">
+                                <td><span class="emp-id-badge">{{ res.yash_id }}</span></td>
+                                <td><div class="emp-name">{{ res.user_name }}</div></td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.irm }}</td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.irm_email }}</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </p-tabpanel>
+                  }
+
                 </p-tabpanels>
               </p-tabs>
 
@@ -573,6 +658,10 @@ import { AuthenticationService } from '../service/authentication.service';
                   <p-tab value="1">IRM Wise</p-tab>
                   <p-tab value="2">Resource wise</p-tab>
                   <p-tab value="3">Project Breakdown</p-tab>
+                  @if (!isPlainUser) {
+                  <p-tab value="4">Utilisation Statistics</p-tab>
+                  <p-tab value="5">Non Filling</p-tab>
+                  }
                 </p-tablist>
                 <p-tabpanels>
 
@@ -754,6 +843,87 @@ import { AuthenticationService } from '../service/authentication.service';
                     </div>
                   </p-tabpanel>
 
+                  @if (!isPlainUser) {
+                  <p-tabpanel value="4">
+                    <div class="section-card">
+                      <div class="section-header">
+                        <span class="section-title">Utilisation Statistics — {{ monthlyData()!.month_name }}</span>
+                        <span class="section-sub">Resources below {{ monthlyData()!.utilization_threshold_pct || 60 }}% utilisation · {{ (monthlyData()!.utilization_stats || []).length }} flagged</span>
+                      </div>
+                      <div class="report-table-wrap">
+                        <table class="res-table">
+                          <thead>
+                            <tr>
+                              <th>Emp ID</th>
+                              <th>Name</th>
+                              <th>BU</th>
+                              <th style="background:#16A34A;">Total Hrs</th>
+                              <th>Scheduled Hrs</th>
+                              <th style="background:#0F2440;">Util %</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @if ((monthlyData()!.utilization_stats || []).length === 0) {
+                              <tr><td colspan="6" style="text-align:center; padding:2rem; color:#94A3B8;">No resources below threshold — everyone is well utilised.</td></tr>
+                            }
+                            @for (res of monthlyData()!.utilization_stats; track res.user_id) {
+                              <tr style="border-bottom:1px solid #F1F5F9;">
+                                <td><span class="emp-id-badge">{{ res.yash_id }}</span></td>
+                                <td>
+                                  <div class="emp-name">{{ res.user_name }}</div>
+                                  <div style="font-size:.7rem; color:#94A3B8;">{{ res.irm }}</div>
+                                </td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
+                                <td class="td-num has-val">{{ res.total_hours }}</td>
+                                <td class="td-num">{{ res.scheduled_hours }}</td>
+                                <td class="td-center"><span class="util-pct low">{{ res.utilization_pct }}%</span></td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </p-tabpanel>
+                  }
+
+                  @if (!isPlainUser) {
+                  <p-tabpanel value="5">
+                    <div class="section-card">
+                      <div class="section-header">
+                        <span class="section-title">Non Filling — {{ monthlyData()!.month_name }}</span>
+                        <span class="section-sub">Resources who have not submitted a timesheet for this period · {{ (monthlyData()!.non_filling || []).length }} resources</span>
+                      </div>
+                      <div class="report-table-wrap">
+                        <table class="res-table">
+                          <thead>
+                            <tr>
+                              <th>Emp ID</th>
+                              <th>Name</th>
+                              <th>BU</th>
+                              <th>IRM</th>
+                              <th>IRM Email</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @if ((monthlyData()!.non_filling || []).length === 0) {
+                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">Everyone has submitted their timesheet for this period.</td></tr>
+                            }
+                            @for (res of monthlyData()!.non_filling; track res.user_id) {
+                              <tr style="border-bottom:1px solid #F1F5F9;">
+                                <td><span class="emp-id-badge">{{ res.yash_id }}</span></td>
+                                <td><div class="emp-name">{{ res.user_name }}</div></td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.irm }}</td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.irm_email }}</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </p-tabpanel>
+                  }
+
                 </p-tabpanels>
               </p-tabs>
 
@@ -803,6 +973,10 @@ import { AuthenticationService } from '../service/authentication.service';
                   <p-tab value="1">IRM Wise</p-tab>
                   <p-tab value="2">Resource wise</p-tab>
                   <p-tab value="3">Project Breakdown</p-tab>
+                  @if (!isPlainUser) {
+                  <p-tab value="4">Utilisation Statistics</p-tab>
+                  <p-tab value="5">Non Filling</p-tab>
+                  }
                 </p-tablist>
                 <p-tabpanels>
 
@@ -965,6 +1139,87 @@ import { AuthenticationService } from '../service/authentication.service';
                     </div>
                   </p-tabpanel>
 
+                  @if (!isPlainUser) {
+                  <p-tabpanel value="4">
+                    <div class="section-card">
+                      <div class="section-header">
+                        <span class="section-title">Utilisation Statistics — {{ selectedYear }}</span>
+                        <span class="section-sub">Resources below {{ yearlyData()!.utilization_threshold_pct || 60 }}% utilisation · {{ (yearlyData()!.utilization_stats || []).length }} flagged</span>
+                      </div>
+                      <div class="report-table-wrap">
+                        <table class="res-table">
+                          <thead>
+                            <tr>
+                              <th>Emp ID</th>
+                              <th>Name</th>
+                              <th>BU</th>
+                              <th style="background:#16A34A;">Total Hrs</th>
+                              <th>Scheduled Hrs</th>
+                              <th style="background:#0F2440;">Util %</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @if ((yearlyData()!.utilization_stats || []).length === 0) {
+                              <tr><td colspan="6" style="text-align:center; padding:2rem; color:#94A3B8;">No resources below threshold — everyone is well utilised.</td></tr>
+                            }
+                            @for (res of yearlyData()!.utilization_stats; track res.user_id) {
+                              <tr style="border-bottom:1px solid #F1F5F9;">
+                                <td><span class="emp-id-badge">{{ res.yash_id }}</span></td>
+                                <td>
+                                  <div class="emp-name">{{ res.user_name }}</div>
+                                  <div style="font-size:.7rem; color:#94A3B8;">{{ res.irm }}</div>
+                                </td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
+                                <td class="td-num has-val">{{ res.total_hours }}</td>
+                                <td class="td-num">{{ res.scheduled_hours }}</td>
+                                <td class="td-center"><span class="util-pct low">{{ res.utilization_pct }}%</span></td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </p-tabpanel>
+                  }
+
+                  @if (!isPlainUser) {
+                  <p-tabpanel value="5">
+                    <div class="section-card">
+                      <div class="section-header">
+                        <span class="section-title">Non Filling — {{ selectedYear }}</span>
+                        <span class="section-sub">Resources who have not submitted a timesheet for this period · {{ (yearlyData()!.non_filling || []).length }} resources</span>
+                      </div>
+                      <div class="report-table-wrap">
+                        <table class="res-table">
+                          <thead>
+                            <tr>
+                              <th>Emp ID</th>
+                              <th>Name</th>
+                              <th>BU</th>
+                              <th>IRM</th>
+                              <th>IRM Email</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @if ((yearlyData()!.non_filling || []).length === 0) {
+                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">Everyone has submitted their timesheet for this period.</td></tr>
+                            }
+                            @for (res of yearlyData()!.non_filling; track res.user_id) {
+                              <tr style="border-bottom:1px solid #F1F5F9;">
+                                <td><span class="emp-id-badge">{{ res.yash_id }}</span></td>
+                                <td><div class="emp-name">{{ res.user_name }}</div></td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.irm }}</td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.irm_email }}</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </p-tabpanel>
+                  }
+
                 </p-tabpanels>
               </p-tabs>
 
@@ -1021,6 +1276,10 @@ import { AuthenticationService } from '../service/authentication.service';
                   <p-tab value="1">IRM Wise</p-tab>
                   <p-tab value="2">Resource wise</p-tab>
                   <p-tab value="3">Project Breakdown</p-tab>
+                  @if (!isPlainUser) {
+                  <p-tab value="4">Utilisation Statistics</p-tab>
+                  <p-tab value="5">Non Filling</p-tab>
+                  }
                 </p-tablist>
                 <p-tabpanels>
 
@@ -1199,6 +1458,87 @@ import { AuthenticationService } from '../service/authentication.service';
                     </div>
                   </p-tabpanel>
 
+                  @if (!isPlainUser) {
+                  <p-tabpanel value="4">
+                    <div class="section-card">
+                      <div class="section-header">
+                        <span class="section-title">Utilisation Statistics — {{ cd.date_range }}</span>
+                        <span class="section-sub">Resources below {{ cd.utilization_threshold_pct || 60 }}% utilisation · {{ (cd.utilization_stats || []).length }} flagged</span>
+                      </div>
+                      <div class="report-table-wrap">
+                        <table class="res-table">
+                          <thead>
+                            <tr>
+                              <th>Emp ID</th>
+                              <th>Name</th>
+                              <th>BU</th>
+                              <th style="background:#16A34A;">Total Hrs</th>
+                              <th>Scheduled Hrs</th>
+                              <th style="background:#0F2440;">Util %</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @if ((cd.utilization_stats || []).length === 0) {
+                              <tr><td colspan="6" style="text-align:center; padding:2rem; color:#94A3B8;">No resources below threshold — everyone is well utilised.</td></tr>
+                            }
+                            @for (res of cd.utilization_stats; track res.user_id) {
+                              <tr style="border-bottom:1px solid #F1F5F9;">
+                                <td><span class="emp-id-badge">{{ res.yash_id }}</span></td>
+                                <td>
+                                  <div class="emp-name">{{ res.user_name }}</div>
+                                  <div style="font-size:.7rem; color:#94A3B8;">{{ res.irm }}</div>
+                                </td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
+                                <td class="td-num has-val">{{ res.total_hours }}</td>
+                                <td class="td-num">{{ res.scheduled_hours }}</td>
+                                <td class="td-center"><span class="util-pct low">{{ res.utilization_pct }}%</span></td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </p-tabpanel>
+                  }
+
+                  @if (!isPlainUser) {
+                  <p-tabpanel value="5">
+                    <div class="section-card">
+                      <div class="section-header">
+                        <span class="section-title">Non Filling — {{ cd.date_range }}</span>
+                        <span class="section-sub">Resources who have not submitted a timesheet for this period · {{ (cd.non_filling || []).length }} resources</span>
+                      </div>
+                      <div class="report-table-wrap">
+                        <table class="res-table">
+                          <thead>
+                            <tr>
+                              <th>Emp ID</th>
+                              <th>Name</th>
+                              <th>BU</th>
+                              <th>IRM</th>
+                              <th>IRM Email</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @if ((cd.non_filling || []).length === 0) {
+                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">Everyone has submitted their timesheet for this period.</td></tr>
+                            }
+                            @for (res of cd.non_filling; track res.user_id) {
+                              <tr style="border-bottom:1px solid #F1F5F9;">
+                                <td><span class="emp-id-badge">{{ res.yash_id }}</span></td>
+                                <td><div class="emp-name">{{ res.user_name }}</div></td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.irm }}</td>
+                                <td style="font-size:.75rem; color:#64748B;">{{ res.irm_email }}</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </p-tabpanel>
+                  }
+
                 </p-tabpanels>
               </p-tabs>
 
@@ -1256,11 +1596,19 @@ export class ReportsComponent implements OnInit {
   monthOptions = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     .map((m, i) => ({ label: m, value: i + 1 }));
 
+  // Plain 'user'-typed accounts get a self-only report (see backend
+  // _team_ids/team_user_ids), so the Utilisation Statistics (<60% flag)
+  // and Non Filling sub-tabs -- which are team-oversight views -- are
+  // hidden for that role. Manager/Superadmin/BUH still see them.
+  isPlainUser = false;
+
   constructor(
     private reportsService: ReportsService,
     private authService: AuthenticationService,
     private messageService: MessageService,
-  ) {}
+  ) {
+    this.isPlainUser = this.authService.userValue?.type === 'user';
+  }
 
   ngOnInit() { this.loadWeeklyReport(); }
 

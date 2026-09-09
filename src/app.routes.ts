@@ -16,7 +16,7 @@ export const appRoutes: Routes = [
         path: 'app',
         component: AppLayout,
         children: [
-            { path: '', component: DashboardComponent, title: 'UTILRATIO - Dashboard' },
+            { path: '', component: DashboardComponent, title: 'RUT - Dashboard' },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ], 
         canActivate: [AuthGuard]

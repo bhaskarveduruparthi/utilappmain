@@ -122,22 +122,15 @@ import { Menu } from 'primeng/menu';
     }
 
     .logo-icon {
-      width: 34px; height: 34px;
-      border-radius: 9px;
-      border: 1px solid rgba(155,142,199,0.45);
-      background: linear-gradient(135deg, rgba(155,142,199,0.2) 0%, rgba(155,142,199,0.05) 100%);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      position: relative;
-      overflow: hidden;
     }
-    .logo-icon::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
+    .logo-icon img {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      display: block;
     }
-    .logo-icon svg { width: 18px; height: 18px; }
 
     .logo-text { display: flex; flex-direction: column; gap: 1px; }
     .logo-name {
@@ -503,22 +496,16 @@ import { Menu } from 'primeng/menu';
 
         <a class="logo-wrap" routerLink="/app">
           <div class="logo-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#9B8EC7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 18L9 12L13 16L21 7"/>
-              <path d="M16 7h5v5"/>
-            </svg>
+            <img src="/yash-logo.png" alt="Yash Technologies" />
           </div>
           <div class="logo-text">
-            <span class="logo-name">Utilization Ratio</span>
+            <span class="logo-name">Resource Utilization Tracker</span>
           </div>
         </a>
 
         <div class="topbar-sep"></div>
 
-        <div class="app-tag">
-          <span class="app-tag-dot"></span>
-          Live Dashboard
-        </div>
+        
       </div>
 
       <!-- RIGHT -->
@@ -704,7 +691,7 @@ export class AppTopbar implements OnInit {
       {
         label: 'Account',
         items: [
-          { label: 'Profile',         icon: 'pi pi-user',     command: () => this.openprofile() },
+          /*{ label: 'Profile',         icon: 'pi pi-user',     command: () => this.openprofile() },*/
           { separator: true },
           { label: 'Change Password', icon: 'pi pi-key',      command: () => this.changeUser_Password() },
           { label: 'Sign Out',        icon: 'pi pi-sign-out', command: () => this.togglelogout() }

@@ -10,6 +10,7 @@ import { ToastModule } from 'primeng/toast';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
+import { PaginatorModule } from 'primeng/paginator';
 import { TextareaModule } from 'primeng/textarea';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -42,7 +43,7 @@ interface TeamResponse {
     CommonModule, FormsModule,
     TableModule, TagModule, ButtonModule, DialogModule,
     ToastModule, SelectModule, TooltipModule, SkeletonModule,
-    TextareaModule, ConfirmDialogModule,
+    TextareaModule, ConfirmDialogModule, PaginatorModule,
     Card
 ],
   providers: [MessageService, ConfirmationService],
@@ -56,8 +57,8 @@ interface TeamResponse {
   <!-- ── Header ── -->
   <div class="team-header">
     <div>
-      <h2 class="team-title">Team Timesheets</h2>
-      <span class="team-sub">Review and approve your team's weekly timesheets</span>
+      <h2 class="team-title">Team Billable Efforts</h2>
+      <span class="team-sub">Review and approve your team's weekly billable efforts</span>
     </div>
     <div class="team-controls">
       <!-- Week navigator -->
@@ -68,6 +69,12 @@ interface TeamResponse {
           <span class="wk-year">{{ weekYear }}</span>
         </div>
         <button class="wk-btn" (click)="shiftWeek(1)"><i class="pi pi-chevron-right"></i></button>
+      </div>
+
+      <div class="search-wrap">
+        <i class="pi pi-search search-icon"></i>
+        <input class="search-box" placeholder="Search name or Emp ID…"
+          [(ngModel)]="searchTerm" (ngModelChange)="applyStatusFilter()" />
       </div>
 
       <p-select
@@ -107,7 +114,7 @@ interface TeamResponse {
         Showing <strong>{{ filteredData().length }}</strong> of <strong>{{ allTeamData().length }}</strong> members
         &nbsp;·&nbsp; Week: <strong>{{ weekLabel }}, {{ weekYear }}</strong>
       </span>
-      @if (pendingCount() > 0 && !selectedStatus) {
+      @if (pendingCount() > 0 && !selectedStatus && !isManagerRole()) {
         <button class="bulk-approve-btn" (click)="bulkApproveConfirm()">
           <i class="pi pi-check-circle"></i>
           Approve All Submitted ({{ pendingCount() }})
@@ -150,7 +157,7 @@ interface TeamResponse {
           </tr>
         </thead>
         <tbody>
-          @for (item of filteredData(); track item.user_id) {
+          @for (item of pagedData(); track item.user_id) {
             <tr [class]="rowClass(item)">
               <td><span class="emp-id">{{ item.yash_id }}</span></td>
               <td>
@@ -207,7 +214,7 @@ interface TeamResponse {
                       <i class="pi pi-eye"></i>
                     </button>
                   }
-                  @if (item.status === 'Submitted') {
+                  @if (item.status === 'Submitted' && !isManagerRole()) {
                     <button class="act-btn approve-btn"
                       [disabled]="item._approving"
                       (click)="approve(item)"
@@ -231,6 +238,15 @@ interface TeamResponse {
           }
         </tbody>
       </table>
+      </div>
+      <div class="paginator-wrap">
+        <p-paginator
+          [totalRecords]="filteredData().length"
+          [rows]="teamRows()"
+          [first]="teamFirst()"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} members"
+          [showCurrentPageReport]="true"
+          (onPageChange)="onTeamPageChange($event)" />
       </div>
     }
   </div>
@@ -374,7 +390,7 @@ interface TeamResponse {
   @if (rejectTarget) {
     <div class="reject-body">
       <div class="reject-who">
-        Rejecting timesheet for <strong>{{ rejectTarget.user_name }}</strong> ({{ weekLabel }})
+        Rejecting Billable Effort for <strong>{{ rejectTarget.user_name }}</strong> ({{ weekLabel }})
       </div>
       <label class="rej-label">Reason for rejection <span class="req">*</span></label>
       <textarea
@@ -408,6 +424,10 @@ interface TeamResponse {
     .team-title { font-size: 2rem; font-weight: 800; color: #111827; margin: 0 0 0.2rem; }
     .team-sub { font-size: 1rem; color: #6B7280; }
     .team-controls { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .search-wrap { position: relative; display: flex; align-items: center; }
+    .search-icon { position: absolute; left: 10px; font-size: 0.78rem; color: #6B7280; pointer-events: none; }
+    .search-box { border: 1px solid #E5E7EB; border-radius: 8px; padding: 7px 12px 7px 30px; font-size: 0.82rem; outline: none; width: 220px; transition: border-color 0.15s, box-shadow 0.15s; background: white; color: #111827; }
+    .search-box:focus { border-color: #1E3A5F; box-shadow: 0 0 0 3px rgba(30,58,95,0.08); }
 
     /* Week navigator */
     .week-nav-group { display: flex; align-items: center; background: white; border: 1px solid #E5E7EB; border-radius: 10px; overflow: hidden; }
@@ -446,6 +466,7 @@ interface TeamResponse {
     .team-table-card { background: white; border: 1px solid #E5E7EB; border-radius: 16px; overflow: hidden; }
     .table-scroll { overflow-x: auto; }
     .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0.875rem 1.25rem; border-bottom: 1px solid #F3F4F6; flex-wrap: wrap; gap: 0.5rem; }
+    .paginator-wrap { display: flex; justify-content: flex-end; padding: 0.65rem 1.25rem 0.875rem 1.25rem; }
     .tb-info { font-size: 0.82rem; color: #6B7280; }
     .bulk-approve-btn { background: #16A34A; color: white; border: none; border-radius: 8px; padding: 0.45rem 1rem; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: background 0.15s; }
     .bulk-approve-btn:hover { background: #15803D; }
@@ -564,7 +585,20 @@ export class TeamTimesheetsComponent implements OnInit {
   rejecting = signal(false);
   allTeamData = signal<TeamMember[]>([]);
   filteredData = signal<TeamMember[]>([]);
+  teamFirst = signal(0);
+  teamRows = signal(10);
+  pagedData = computed(() => {
+    const first = this.teamFirst();
+    const rows = this.teamRows();
+    return this.filteredData().slice(first, first + rows);
+  });
   selectedStatus: string | null = null;
+  searchTerm: string = '';
+
+  // Manager sees Approve/Reject only inside the View dialog, not on the row
+  // or as a bulk action — mirrors the row-action gating used elsewhere
+  // (see manageprojects.component.ts's isAdminRole for the same pattern).
+  isManagerRole = signal(false);
 
   // Week navigation
   currentWeekStart: Date = this.getMonday(new Date());
@@ -617,7 +651,9 @@ export class TeamTimesheetsComponent implements OnInit {
     private authService: AuthenticationService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-  ) {}
+  ) {
+    this.isManagerRole.set(this.authService.userValue?.type === 'manager');
+  }
 
   ngOnInit() { this.loadTeam(true); }
 
@@ -676,11 +712,20 @@ export class TeamTimesheetsComponent implements OnInit {
 }
 
   applyStatusFilter() {
-    if (!this.selectedStatus) {
-      this.filteredData.set(this.allTeamData());
-    } else {
-      this.filteredData.set(this.allTeamData().filter(m => m.status === this.selectedStatus));
+    let result = this.selectedStatus
+      ? this.allTeamData().filter(m => m.status === this.selectedStatus)
+      : this.allTeamData();
+
+    const term = this.searchTerm.trim().toLowerCase();
+    if (term) {
+      result = result.filter(m =>
+        m.user_name.toLowerCase().includes(term) ||
+        m.yash_id.toLowerCase().includes(term)
+      );
     }
+
+    this.filteredData.set(result);
+    this.teamFirst.set(0);
   }
 
   filterByStatus(val: string | null) {
@@ -688,7 +733,9 @@ export class TeamTimesheetsComponent implements OnInit {
     this.applyStatusFilter();
   }
 
-  clearFilter() { this.selectedStatus = null; this.applyStatusFilter(); }
+  clearFilter() { this.selectedStatus = null; this.searchTerm = ''; this.applyStatusFilter(); }
+
+  onTeamPageChange(event: any) { this.teamFirst.set(event.first); this.teamRows.set(event.rows); }
 
   rowClass(item: TeamMember) {
     if (item.status === 'Not Submitted') return 'row-not-submitted';
@@ -743,12 +790,12 @@ export class TeamTimesheetsComponent implements OnInit {
         this.applyStatusFilter();
         this.messageService.add({
           severity: 'success', summary: 'Approved',
-          detail: `${item.user_name}'s timesheet approved`
+          detail: `${item.user_name}'s Billable Effort approved`
         });
       },
       error: () => {
         item._approving = false;
-        this.messageService.add({ severity: 'error', summary: 'Failed', detail: 'Could not approve timesheet' });
+        this.messageService.add({ severity: 'error', summary: 'Failed', detail: 'Could not approve Billable Effort' });
       }
     });
   }
@@ -776,12 +823,12 @@ export class TeamTimesheetsComponent implements OnInit {
         this.rejectVisible = false;
         this.messageService.add({
           severity: 'warn', summary: 'Rejected',
-          detail: `${target.user_name}'s timesheet rejected`
+          detail: `${target.user_name}'s Billable Effort rejected`
         });
       },
       error: () => {
         this.rejecting.set(false);
-        this.messageService.add({ severity: 'error', summary: 'Failed', detail: 'Could not reject timesheet' });
+        this.messageService.add({ severity: 'error', summary: 'Failed', detail: 'Could not reject Billable Effort' });
       }
     });
   }
@@ -813,7 +860,7 @@ export class TeamTimesheetsComponent implements OnInit {
           );
           this.applyStatusFilter();
           if (done === pending.length) {
-            this.messageService.add({ severity: 'success', summary: 'All Approved', detail: `${done} timesheets approved` });
+            this.messageService.add({ severity: 'success', summary: 'All Approved', detail: `${done} Billable Efforts approved` });
           }
         }
       });
