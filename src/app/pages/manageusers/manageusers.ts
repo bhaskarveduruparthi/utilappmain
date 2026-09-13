@@ -21,6 +21,8 @@ import { PanelModule } from 'primeng/panel';
 import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
 import { PaginatorModule } from 'primeng/paginator';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
@@ -303,7 +305,7 @@ interface ExportColumn { title: string; dataKey: string; }
     <div class="table-card">
         <div class="table-meta-row">
             <span class="table-meta-label">
-                <strong>{{ filteredUsersList.length }}</strong> users
+                <strong>{{ totalitems }}</strong> users
                 @if (searchTerm) { · matching "<strong>{{ searchTerm }}</strong>" }
             </span>
         </div>
@@ -456,7 +458,7 @@ interface ExportColumn { title: string; dataKey: string; }
 
         <div class="paginator-wrap">
             <p-paginator
-                [totalRecords]="filteredUsersList.length"
+                [totalRecords]="totalitems"
                 [rows]="rows"
                 [first]="first"
                 [rowsPerPageOptions]="[10, 20, 30]"
@@ -630,9 +632,12 @@ export class ManageUsers implements OnInit {
     user!: User;
     submitted          = false;
     filteredUsersList : User[] = [];
+    totalitems         = 0;
+    currentPage        = 1;
     first              = 0;
     rows               = 10;
     searchTerm         = '';
+    private searchSubject = new Subject<string>();
     loading            = true;
     isvalid            = false;
     isAdminRole        = false;
@@ -695,7 +700,12 @@ export class ManageUsers implements OnInit {
     }
 
     ngOnInit() {
-        this.loadDemoData();
+        this.loadUsers();
+        this.searchSubject.pipe(debounceTime(400), distinctUntilChanged()).subscribe(term => {
+            this.currentPage = 1;
+            this.first = 0;
+            this.loadUsers(1, term);
+        });
         this.cols = [
             { field: 'yash_id', header: 'Yash ID' },
             { field: 'name',    header: 'User Name' },
@@ -710,33 +720,45 @@ export class ManageUsers implements OnInit {
         this.exportColumns = this.cols.map(c => ({ title: c.header, dataKey: c.field }));
     }
 
-    loadDemoData() {
-        this.manageadminservice.getUsers().subscribe((data: any) => {
-            this.users.set(data);
-            this.filteredUsersList = data;
-            this.loading = false;
+    // Server-side pagination + search: getallusers now returns only the
+    // current page ({data, totalrecords, page, pages}) instead of every
+    // user in one response - see resources/user_views.py.
+    loadUsers(page: number = this.currentPage, search: string = this.searchTerm) {
+        this.loading = true;
+        this.manageadminservice.getUsers(page, search, this.rows).subscribe({
+            next: (res: any) => {
+                const list = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+                this.users.set(list);
+                this.filteredUsersList = list;
+                this.totalitems = res?.totalrecords ?? list.length;
+                this.currentPage = res?.page ?? page;
+                this.loading = false;
+            },
+            error: () => {
+                this.users.set([]);
+                this.filteredUsersList = [];
+                this.totalitems = 0;
+                this.loading = false;
+            }
         });
     }
 
     onSearch(event: Event) {
-        const value = (event.target as HTMLInputElement).value.toLowerCase();
+        const value = (event.target as HTMLInputElement).value;
         this.searchTerm = value;
-        this.first = 0;
-        this.filteredUsersList = value
-            ? this.users().filter(u =>
-                u.name?.toLowerCase().includes(value)       ||
-                u.email?.toLowerCase().includes(value)      ||
-                u.yash_id?.toString().includes(value)       ||
-                u.b_unit?.toLowerCase().includes(value)     ||
-                u.irm?.toLowerCase().includes(value))
-            : this.users();
+        this.searchSubject.next(value);
     }
 
     get paginatedUsers(): User[] {
-        return this.filteredUsersList.slice(this.first, this.first + this.rows);
+        return this.filteredUsersList;
     }
 
-    onPageChange(event: any) { this.first = event.first; this.rows = event.rows; }
+    onPageChange(event: any) {
+        this.first = event.first;
+        this.rows = event.rows;
+        this.currentPage = event.page + 1;
+        this.loadUsers(this.currentPage, this.searchTerm);
+    }
 
     getInitials(name?: string): string {
         if (!name) return '?';
@@ -769,8 +791,7 @@ export class ManageUsers implements OnInit {
             this.userDialog = false;
             this.submitted = false;
             this.user = {};
-            this.users.update(list => [...list, created]);
-            this.filteredUsersList = this.users();
+            this.loadUsers(this.currentPage, this.searchTerm);
             this.messageService.add({ severity: 'success', summary: 'User Added', detail: `${created.name} added successfully`, life: 3000 });
         });
     }
@@ -793,17 +814,34 @@ export class ManageUsers implements OnInit {
     }
 
     exportCSV() {
-        if (!this.filteredUsersList.length) return;
-        const data = this.filteredUsersList.map(u => {
-            const row: any = {};
-            this.exportColumns.forEach(c => row[c.title] = (u as any)[c.dataKey]);
-            return row;
+        // Manage Users only ever holds the current page in memory now, so
+        // export fetches the full (role-scoped) list from the server on
+        // demand rather than exporting whatever page happens to be open.
+        this.manageadminservice.getAllUsersRecords().subscribe((res: any) => {
+            const all: User[] = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+            const term = this.searchTerm.toLowerCase();
+            const list = term
+                ? all.filter(u =>
+                    u.name?.toLowerCase().includes(term)       ||
+                    u.email?.toLowerCase().includes(term)      ||
+                    u.yash_id?.toString().includes(term)       ||
+                    u.b_unit?.toLowerCase().includes(term)     ||
+                    u.irm?.toLowerCase().includes(term))
+                : all;
+
+            if (!list.length) return;
+
+            const data = list.map(u => {
+                const row: any = {};
+                this.exportColumns.forEach(c => row[c.title] = (u as any)[c.dataKey]);
+                return row;
+            });
+            const ws   = XLSX.utils.json_to_sheet(data);
+            const wb   = { Sheets: { Users: ws }, SheetNames: ['Users'] };
+            const buf  = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            saveAs(new Blob([buf], { type: 'application/octet-stream' }), 'users_list.xlsx');
+            this.messageService.add({ severity: 'success', summary: 'Exported', detail: 'Excel downloaded', life: 3000 });
         });
-        const ws   = XLSX.utils.json_to_sheet(data);
-        const wb   = { Sheets: { Users: ws }, SheetNames: ['Users'] };
-        const buf  = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-        saveAs(new Blob([buf], { type: 'application/octet-stream' }), 'users_list.xlsx');
-        this.messageService.add({ severity: 'success', summary: 'Exported', detail: 'Excel downloaded', life: 3000 });
     }
 
     filterTypes(event: { query: string }) {

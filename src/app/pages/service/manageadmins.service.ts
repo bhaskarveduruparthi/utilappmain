@@ -41,8 +41,15 @@ export class ManageAdminsService {
 
   // ========== Existing Methods ==========
 
-  getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.url}users/getallusers`);
+  getUsers(page: number = 1, search: string = '', perPage: number = 10): Observable<any> {
+    const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
+    return this.http.get(`${this.url}users/getallusers?page=${page}&per_page=${perPage}${searchParam}`);
+  }
+
+  // Full, unpaginated user list - used only by the Manage Users Excel
+  // export button, not the normal page load.
+  getAllUsersRecords(): Observable<any> {
+    return this.http.get(`${this.url}users/getallusersrecords`);
   }
 
   getManagers(): Observable<User[]> {

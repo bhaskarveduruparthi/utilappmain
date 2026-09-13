@@ -419,33 +419,28 @@ export class LoginHistory implements OnInit {
             this.first = (this.LHistoryCurrentPage - 1) * 10;
         }
         this.loadLogs(this.LHistoryCurrentPage);
-        this.loadTotalCount();
     }
 
+    // getlogs now returns {data, totalrecords, page, pages} in one response
+    // (see resources/user_views.py), so the page and its total count arrive
+    // together - no more separate full-table fetch just for the count.
     loadLogs(page: number) {
         this.loading = true;
         this.manageadminservice.getalllogs(page).subscribe({
-            next: (data: any) => {
-                const arr = Array.isArray(data) ? data : [];
+            next: (res: any) => {
+                const arr = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
                 this.logs.set(arr);
                 this.allLogs.set(arr);
+                this.totalitems = res?.totalrecords ?? arr.length;
                 this.loading = false;
             },
             error: () => {
                 this.logs.set([]);
                 this.allLogs.set([]);
+                this.totalitems = 0;
                 this.loading = false;
                 this.messageservice.add({ severity: 'error', summary: 'Error', detail: 'Failed to load logs' });
             }
-        });
-    }
-
-    loadTotalCount() {
-        this.manageadminservice.get_log_records().subscribe({
-            next: (data: any) => {
-                this.totalitems = data?.totalrecords ?? (Array.isArray(data) ? data.length : 0);
-            },
-            error: () => {}
         });
     }
 
