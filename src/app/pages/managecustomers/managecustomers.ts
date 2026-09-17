@@ -58,13 +58,13 @@ import { AuthenticationService } from '../service/authentication.service';
             gap: 1rem;
         }
         .page-title {
-            font-size: 1.45rem;
+            font-size: var(--fs-page-title);
             font-weight: 800;
             color: #0F172A;
             margin: 0 0 0.15rem;
             letter-spacing: -0.02em;
         }
-        .page-sub { font-size: 0.81rem; color: #64748B; }
+        .page-sub { font-size: var(--fs-page-sub); color: #64748B; }
 
         /* ── Action bar ── */
         .action-bar {
@@ -146,7 +146,7 @@ import { AuthenticationService } from '../service/authentication.service';
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.82rem;
+            font-size: var(--fs-table-body);
             min-width: 1200px;
         }
         .data-table thead th {

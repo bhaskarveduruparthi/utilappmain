@@ -2,4 +2,11 @@
     --surface-ground: var(--p-surface-950);
     --code-background: var(--p-surface-800);
     --code-color: var(--p-surface-100);
+
+    // Sidebar navigation panel — white like before, with the topbar's color fading in near the bottom edge
+    --sidebar-background: linear-gradient(180deg, #ffffff 0%, #ffffff 55%, #cdc3e8 75%, #4b3f6b 90%, #130e22 100%);
+    --sidebar-text-color: var(--text-color);
+    --sidebar-text-hover-color: var(--text-color);
+    --sidebar-hover-background: var(--surface-hover);
+    --sidebar-root-text-color: var(--text-color);
 }

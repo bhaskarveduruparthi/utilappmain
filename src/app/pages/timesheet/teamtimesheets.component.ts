@@ -417,12 +417,12 @@ interface TeamResponse {
 </p-dialog>
   `,
   styles: [`
-    .team-page { padding: 1.5rem 2rem; max-width: 1400px; margin: 0 auto; font-size: 1.2rem; }
+    .team-page { padding: 1.5rem 2rem; max-width: 1400px; margin: 0 auto; }
 
     /* Header */
     .team-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem; }
-    .team-title { font-size: 2rem; font-weight: 800; color: #111827; margin: 0 0 0.2rem; }
-    .team-sub { font-size: 1rem; color: #6B7280; }
+    .team-title { font-size: var(--fs-page-title); font-weight: 800; color: #111827; margin: 0 0 0.2rem; }
+    .team-sub { font-size: var(--fs-page-sub); color: #6B7280; }
     .team-controls { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
     .search-wrap { position: relative; display: flex; align-items: center; }
     .search-icon { position: absolute; left: 10px; font-size: 0.78rem; color: #6B7280; pointer-events: none; }
@@ -480,8 +480,8 @@ interface TeamResponse {
     .clear-filter-btn { background: none; border: 1px solid #E5E7EB; border-radius: 8px; padding: 6px 16px; cursor: pointer; font-size: 0.82rem; margin-top: 0.5rem; }
 
     /* Table */
-    .team-table { width: 100%; border-collapse: collapse; font-size: 1rem; }
-    .team-table thead th { background: #F8FAFC; padding: 1rem 1.2rem; font-weight: 600; color: #374151; border-bottom: 2px solid #E5E7EB; white-space: nowrap; text-align: left; font-size: 1rem; }
+    .team-table { width: 100%; border-collapse: collapse; font-size: var(--fs-table-body); }
+    .team-table thead th { background: #F8FAFC; padding: 1rem 1.2rem; font-weight: 600; color: #374151; border-bottom: 2px solid #E5E7EB; white-space: nowrap; text-align: left; font-size: var(--fs-table-header); }
     .team-table tbody tr:hover { background: #F9FAFB; }
     .team-table tbody td { padding: 1rem 1.2rem; border-bottom: 1px solid #F3F4F6; vertical-align: middle; }
 

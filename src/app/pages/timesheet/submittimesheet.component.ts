@@ -289,8 +289,8 @@ interface TimesheetRow {
     .copy-btn:hover { background: #EEF2FF; }
     .readonly-badge { font-size: 0.73rem; color: #6B7280; background: #F3F4F6; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 0.3rem; }
     .ts-grid-wrapper { overflow-x: auto; }
-    .ts-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-    .ts-table thead th { background: #F8FAFC; padding: 0.8rem 0.6rem; text-align: center; font-weight: 600; color: #374151; border-bottom: 2px solid #E5E7EB; white-space: nowrap; font-size: 0.9rem; }
+    .ts-table { width: 100%; border-collapse: collapse; font-size: var(--fs-table-body); }
+    .ts-table thead th { background: #F8FAFC; padding: 0.8rem 0.6rem; text-align: center; font-weight: 600; color: #374151; border-bottom: 2px solid #E5E7EB; white-space: nowrap; font-size: var(--fs-table-header); }
     .col-project { width: 230px; text-align: left !important; padding-left: 1rem !important; }
     .col-type { width: 90px; }
     .col-day { width: 64px; }

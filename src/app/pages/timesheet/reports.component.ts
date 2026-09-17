@@ -13,6 +13,7 @@ import { ChartModule }      from 'primeng/chart';
 import { SelectModule }     from 'primeng/select';
 import { InputTextModule }  from 'primeng/inputtext';
 import { TooltipModule }    from 'primeng/tooltip';
+import { DialogModule }     from 'primeng/dialog';
 import { MessageService }   from 'primeng/api';
 import { Card }             from 'primeng/card';
 
@@ -27,14 +28,15 @@ import { AuthenticationService } from '../service/authentication.service';
     TabsModule, ButtonModule, TableModule, TagModule,
     DatePickerModule, SkeletonModule, ToastModule,
     ChartModule, SelectModule, InputTextModule, TooltipModule,
+    DialogModule,
     Card,
   ],
   providers: [MessageService, ReportsService, AuthenticationService],
   styles: [`
     /* ─── Shell ─── */
     .rpt-page { padding: 1.5rem 2rem; max-width: 1800px; margin: 0 auto; }
-    .page-title { font-size: 1.45rem; font-weight: 800; color: #0F172A; margin: 0 0 .15rem; letter-spacing: -.02em; }
-    .page-sub { font-size: .81rem; color: #64748B; }
+    .page-title { font-size: var(--fs-page-title); font-weight: 800; color: #0F172A; margin: 0 0 .15rem; letter-spacing: -.02em; }
+    .page-sub { font-size: var(--fs-page-sub); color: #64748B; }
     .tab-content { padding: 1.5rem 0 0; }
 
     /* ─── Sub-tabs (section navigation within a period) ─── */
@@ -109,13 +111,13 @@ import { AuthenticationService } from '../service/authentication.service';
 
     /* ─── Report table (matches Excel layout exactly) ─── */
     .report-table-wrap { overflow-x: auto; }
-    .report-table { width:100%; border-collapse:collapse; font-size:.8rem; min-width:900px; line-height:1.4; }
+    .report-table { width:100%; table-layout:fixed; border-collapse:collapse; font-size:var(--fs-table-body); line-height:1.4; }
 
     /* Top header */
     .report-table thead tr.tr-header th {
       background: #1E3A5F; color: white;
       padding:.625rem .75rem; text-align:center;
-      font-weight:600; font-size:.75rem; white-space:nowrap;
+      font-weight:600; font-size:var(--fs-table-header); white-space:nowrap;
       border-right:1px solid rgba(255,255,255,.15);
     }
     .report-table thead tr.tr-header th.th-left { text-align:left; }
@@ -123,7 +125,7 @@ import { AuthenticationService } from '../service/authentication.service';
     /* Manager group row */
     .report-table tbody tr.tr-manager td {
       background: #EAF0FA; font-weight:700; color:#1E3A5F;
-      padding:.6rem .75rem; font-size:.83rem;
+      padding:.6rem .75rem; font-size:var(--fs-table-body);
     }
 
     /* Project sub-rows */
@@ -145,19 +147,19 @@ import { AuthenticationService } from '../service/authentication.service';
 
     /* Grand total footer */
     .report-table tfoot tr { background:#1E3A5F; }
-    .report-table tfoot td { padding:.6rem .75rem; color:white; font-weight:700; font-size:.79rem; text-align:right; font-variant-numeric:tabular-nums; }
+    .report-table tfoot td { padding:.6rem .75rem; color:white; font-weight:700; font-size:var(--fs-table-body); text-align:right; font-variant-numeric:tabular-nums; }
     .report-table tfoot td.td-label { text-align:left; }
 
     /* Numeric cells */
-    .td-num { text-align:right; font-variant-numeric:tabular-nums; font-size:.79rem; }
+    .td-num { text-align:right; font-variant-numeric:tabular-nums; font-size:var(--fs-table-body); }
     .td-num.has-val { font-weight:700; color:#1E3A5F; }
     .td-name-left { text-align:left; }
     .td-center { text-align:center; }
 
     /* IRM Wise table */
-    .irm-table { width:100%; border-collapse:collapse; font-size:.81rem; line-height:1.4; }
+    .irm-table { width:100%; table-layout:fixed; border-collapse:collapse; font-size:var(--fs-table-body); line-height:1.4; }
     .irm-table thead th { background:#F8FAFC; padding:.6rem .875rem; text-align:left; font-weight:600; color:#475569; border-bottom:2px solid #E2E8F0; }
-    .irm-table thead th.th-r { text-align:right; }
+    .irm-table thead th.th-r { text-align:right; width:150px; }
     .irm-table tbody tr { border-bottom:1px solid #F1F5F9; }
     .irm-table tbody tr:hover { background:#F8FAFC; }
     .irm-table tbody td { padding:.52rem .875rem; vertical-align:middle; }
@@ -167,8 +169,8 @@ import { AuthenticationService } from '../service/authentication.service';
     .irm-table tfoot td.td-label { text-align:left; }
 
     /* Resource table */
-    .res-table { width:100%; border-collapse:collapse; font-size:.78rem; min-width:800px; line-height:1.4; }
-    .res-table thead th { background:#1E3A5F; color:white; padding:.55rem .7rem; font-size:.74rem; font-weight:600; white-space:nowrap; border-right:1px solid rgba(255,255,255,.15); text-align:center; }
+    .res-table { width:100%; table-layout:fixed; border-collapse:collapse; font-size:var(--fs-table-body); line-height:1.4; }
+    .res-table thead th { background:#1E3A5F; color:white; padding:.55rem .7rem; font-size:var(--fs-table-header); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-right:1px solid rgba(255,255,255,.15); text-align:center; }
     .res-table thead th:first-child,.res-table thead th:nth-child(2) { text-align:left; }
     .res-table tbody tr { border-bottom:1px solid #F1F5F9; }
     .res-table tbody tr:hover { background:#F8FAFC; }
@@ -181,7 +183,7 @@ import { AuthenticationService } from '../service/authentication.service';
        instead of matching the header, which is what made it look broken. */
     .res-table tfoot tr { background:#1E3A5F; }
     .res-table tfoot td {
-      padding:.65rem .7rem; color:white; font-weight:700; font-size:.79rem;
+      padding:.65rem .7rem; color:white; font-weight:700; font-size:var(--fs-table-body);
       text-align:right; font-variant-numeric:tabular-nums;
       border-right:1px solid rgba(255,255,255,.12);
     }
@@ -215,6 +217,35 @@ import { AuthenticationService } from '../service/authentication.service';
     /* Emp ID badge */
     .emp-id-badge { font-family:monospace; font-size:.74rem; background:#EFF6FF; color:#1E40AF; padding:2px 6px; border-radius:4px; font-weight:600; }
     .emp-name { font-weight:600; color:#0F172A; font-size:.82rem; }
+
+    /* Billable Efforts button + dialog */
+    .billable-btn { font-size:.72rem !important; padding:.25rem .5rem !important; }
+    ::ng-deep .billable-dialog .p-dialog-header {
+      background: linear-gradient(135deg, #1E3A5F 0%, #16A34A 130%);
+      color: #fff; padding: 1rem 1.5rem; border-radius: 12px 12px 0 0;
+    }
+    ::ng-deep .billable-dialog .p-dialog-title { color: #fff; font-weight: 700; font-size: 1rem; }
+    ::ng-deep .billable-dialog .p-dialog-close-button { color: rgba(255,255,255,.85); }
+    ::ng-deep .billable-dialog .p-dialog-close-button:hover { background: rgba(255,255,255,.18); color: #fff; }
+    ::ng-deep .billable-dialog .p-dialog-header-close-icon { color: inherit; }
+    ::ng-deep .billable-dialog.p-dialog {
+      width: 560px; max-width: 92vw; height: auto; max-height: 85vh;
+      display: flex; flex-direction: column;
+    }
+    ::ng-deep .billable-dialog .p-dialog-content {
+      flex: 0 1 auto; overflow-y: auto; padding: 1.25rem 1.5rem 1.5rem;
+    }
+    .billable-dialog-head { margin-bottom:1rem; padding-bottom:.75rem; border-bottom:1px solid #E2E8F0; }
+    .billable-dialog-name { font-weight:700; font-size:.95rem; color:#0F172A; }
+    .billable-dialog-sub  { font-size:.78rem; color:#64748B; margin-top:.15rem; }
+    .billable-dialog-empty { text-align:center; padding:2rem 0; color:#94A3B8; font-size:.85rem; }
+    .billable-dialog-table { width:100%; border-collapse:collapse; font-size:.83rem; }
+    .billable-dialog-table thead th { text-align:left; padding:.6rem .75rem; font-weight:600; color:#fff; background:#1E3A5F; }
+    .billable-dialog-table thead th.th-r { text-align:right; }
+    .billable-dialog-table tbody td { padding:.55rem .75rem; border-bottom:1px solid #F1F5F9; }
+    .billable-dialog-table td.td-r { text-align:right; font-variant-numeric:tabular-nums; font-weight:600; color:#1E3A5F; }
+    .billable-dialog-table tfoot td { padding:.6rem .75rem; font-weight:700; color:#0F172A; border-top:2px solid #E2E8F0; }
+    .billable-dialog-table tfoot td.td-r { text-align:right; font-variant-numeric:tabular-nums; }
 
     /* Project bars */
     .proj-breakdown { display:flex; flex-direction:column; gap:.5rem; padding:.25rem 0; }
@@ -350,9 +381,9 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="report-table">
                           <thead>
                             <tr class="tr-header">
-                              <th class="th-left" style="min-width:220px;">Manager / Project</th>
-                              <th style="min-width:110px;">{{ weeklyData()!.week_label }}</th>
-                              <th style="min-width:110px;">Total</th>
+                              <th class="th-left">Manager / Project</th>
+                              <th style="width:110px;">{{ weeklyData()!.week_label }}</th>
+                              <th style="width:110px;">Total</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -440,18 +471,17 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="res-table">
                           <thead>
                             <tr>
-                              <th>Emp ID</th>
+                              <th style="width:78px;">Emp ID</th>
                               <th>Name</th>
-                              <th>BU / IRM</th>
-                              @for (p of weeklyTopProjects(); track p) { <th>{{ p }}</th> }
-                              <th style="background:#16A34A;">Total Hrs</th>
-                              <th style="background:#0F2440;">Util %</th>
-                              <th style="background:#0F2440;">Status</th>
+                              <th style="background:#16A34A; width:100px;">Total Hrs</th>
+                              <th style="background:#0F2440; width:76px;">Util %</th>
+                              <th style="background:#0F2440; width:92px;">Status</th>
+                              <th style="width:150px;">Billable Efforts</th>
                             </tr>
                           </thead>
                           <tbody>
                             @if (weeklyFilteredResources().length === 0) {
-                              <tr><td [attr.colspan]="weeklyTopProjects().length + 6" style="text-align:center; padding:2rem; color:#94A3B8;">No resources match your filter.</td></tr>
+                              <tr><td colspan="6" style="text-align:center; padding:2rem; color:#94A3B8;">No resources match your filter.</td></tr>
                             }
                             @for (res of weeklyFilteredResources(); track res.user_id) {
                               <tr [class.tr-zero]="res.total_hours === 0" style="border-bottom:1px solid #F1F5F9;">
@@ -460,10 +490,6 @@ import { AuthenticationService } from '../service/authentication.service';
                                   <div class="emp-name">{{ res.user_name }}</div>
                                   <div style="font-size:.7rem; color:#94A3B8;">{{ res.irm }}</div>
                                 </td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
-                                @for (p of weeklyTopProjects(); track p) {
-                                  <td class="td-num" [class.has-val]="getProjectHours(res, p) > 0">{{ getProjectHours(res, p) || '—' }}</td>
-                                }
                                 <td>
                                   <div class="total-bar-cell">
                                     <div class="total-bar-track">
@@ -486,15 +512,20 @@ import { AuthenticationService } from '../service/authentication.service';
                                   </span>
                                 </td>
                                 <td class="td-center"><span class="status-pill" [class]="statusClass(res.status)">{{ res.status || 'Draft' }}</span></td>
+                                <td class="td-center">
+                                  <p-button label="View" icon="pi pi-eye" size="small" [text]="true"
+                                    styleClass="billable-btn" (onClick)="openBillableEfforts(res)"
+                                    pTooltip="View Billable Efforts" tooltipPosition="top" />
+                                </td>
                               </tr>
                             }
                           </tbody>
                           <tfoot>
                             <tr>
-                              <td class="td-label" colspan="3">Grand Total</td>
-                              @for (p of weeklyTopProjects(); track p) { <td>{{ weeklyProjectTotal(p) || '' }}</td> }
+                              <td class="td-label" colspan="2">Grand Total</td>
                               <td>{{ weeklyFilteredTotal() }}</td>
                               <td>{{ weeklyUtilPct() }}%</td>
+                              <td></td>
                               <td></td>
                             </tr>
                           </tfoot>
@@ -538,17 +569,16 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="res-table">
                           <thead>
                             <tr>
-                              <th>Emp ID</th>
+                              <th style="width:78px;">Emp ID</th>
                               <th>Name</th>
-                              <th>BU</th>
-                              <th style="background:#16A34A;">Total Hrs</th>
-                              <th>Scheduled Hrs</th>
-                              <th style="background:#0F2440;">Util %</th>
+                              <th style="background:#16A34A; width:100px;">Total Hrs</th>
+                              <th style="width:110px;">Scheduled Hrs</th>
+                              <th style="background:#0F2440; width:76px;">Util %</th>
                             </tr>
                           </thead>
                           <tbody>
                             @if ((weeklyData()!.utilization_stats || []).length === 0) {
-                              <tr><td colspan="6" style="text-align:center; padding:2rem; color:#94A3B8;">No resources below threshold — everyone is well utilised.</td></tr>
+                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">No resources below threshold — everyone is well utilised.</td></tr>
                             }
                             @for (res of weeklyData()!.utilization_stats; track res.user_id) {
                               <tr style="border-bottom:1px solid #F1F5F9;">
@@ -557,7 +587,6 @@ import { AuthenticationService } from '../service/authentication.service';
                                   <div class="emp-name">{{ res.user_name }}</div>
                                   <div style="font-size:.7rem; color:#94A3B8;">{{ res.irm }}</div>
                                 </td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
                                 <td class="td-num has-val">{{ res.total_hours }}</td>
                                 <td class="td-num">{{ res.scheduled_hours }}</td>
                                 <td class="td-center"><span class="util-pct low">{{ res.utilization_pct }}%</span></td>
@@ -581,24 +610,20 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="res-table">
                           <thead>
                             <tr>
-                              <th>Emp ID</th>
+                              <th style="width:78px;">Emp ID</th>
                               <th>Name</th>
-                              <th>BU</th>
-                              <th>IRM</th>
-                              <th>IRM Email</th>
+                              <th style="width:140px;">IRM</th>
                             </tr>
                           </thead>
                           <tbody>
                             @if ((weeklyData()!.non_filling || []).length === 0) {
-                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">Everyone has submitted their timesheet for this period.</td></tr>
+                              <tr><td colspan="3" style="text-align:center; padding:2rem; color:#94A3B8;">Everyone has submitted their timesheet for this period.</td></tr>
                             }
                             @for (res of weeklyData()!.non_filling; track res.user_id) {
                               <tr style="border-bottom:1px solid #F1F5F9;">
                                 <td><span class="emp-id-badge">{{ res.yash_id }}</span></td>
                                 <td><div class="emp-name">{{ res.user_name }}</div></td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
                                 <td style="font-size:.75rem; color:#64748B;">{{ res.irm }}</td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.irm_email }}</td>
                               </tr>
                             }
                           </tbody>
@@ -675,9 +700,9 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="report-table">
                           <thead>
                             <tr class="tr-header">
-                              <th class="th-left" style="min-width:220px;">Manager / Project</th>
-                              @for (w of monthlyWeekLabels(); track w) { <th style="min-width:100px;">{{ w }}</th> }
-                              <th style="min-width:110px;">Total</th>
+                              <th class="th-left">Manager / Project</th>
+                              @for (w of monthlyWeekLabels(); track w) { <th style="width:100px;">{{ w }}</th> }
+                              <th style="width:110px;">Total</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -760,17 +785,16 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="res-table">
                           <thead>
                             <tr>
-                              <th>Emp ID</th>
+                              <th style="width:78px;">Emp ID</th>
                               <th>Name</th>
-                              <th>BU / IRM</th>
-                              @for (p of monthlyTopProjects(); track p) { <th>{{ p }}</th> }
-                              <th style="background:#16A34A;">Total Hrs</th>
-                              <th style="background:#0F2440;">Util %</th>
+                              <th style="background:#16A34A; width:100px;">Total Hrs</th>
+                              <th style="background:#0F2440; width:76px;">Util %</th>
+                              <th style="width:150px;">Billable Efforts</th>
                             </tr>
                           </thead>
                           <tbody>
                             @if (monthlyFiltered().length === 0) {
-                              <tr><td [attr.colspan]="monthlyTopProjects().length + 5" style="text-align:center; padding:2rem; color:#94A3B8;">No resources match your filter.</td></tr>
+                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">No resources match your filter.</td></tr>
                             }
                             @for (res of monthlyFiltered(); track res.user_id) {
                               <tr [class.tr-zero]="res.total_hours === 0" style="border-bottom:1px solid #F1F5F9;">
@@ -779,10 +803,6 @@ import { AuthenticationService } from '../service/authentication.service';
                                   <div class="emp-name">{{ res.user_name }}</div>
                                   <div style="font-size:.7rem; color:#94A3B8;">{{ res.irm }}</div>
                                 </td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
-                                @for (p of monthlyTopProjects(); track p) {
-                                  <td class="td-num" [class.has-val]="getProjectHours(res, p) > 0">{{ getProjectHours(res, p) || '—' }}</td>
-                                }
                                 <td>
                                   <div class="total-bar-cell">
                                     <div class="total-bar-track">
@@ -804,15 +824,20 @@ import { AuthenticationService } from '../service/authentication.service';
                                     {{ utilPct(res.total_hours, monthlyWeekLabels().length*45) }}%
                                   </span>
                                 </td>
+                                <td class="td-center">
+                                  <p-button label="View" icon="pi pi-eye" size="small" [text]="true"
+                                    styleClass="billable-btn" (onClick)="openBillableEfforts(res)"
+                                    pTooltip="View Billable Efforts" tooltipPosition="top" />
+                                </td>
                               </tr>
                             }
                           </tbody>
                           <tfoot>
                             <tr>
-                              <td class="td-label" colspan="3">Grand Total</td>
-                              @for (p of monthlyTopProjects(); track p) { <td>{{ monthlyProjectTotal(p) || '' }}</td> }
+                              <td class="td-label" colspan="2">Grand Total</td>
                               <td>{{ monthlyFilteredTotal() }}</td>
                               <td>{{ monthlyAvgUtil() }}%</td>
+                              <td></td>
                             </tr>
                           </tfoot>
                         </table>
@@ -854,17 +879,16 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="res-table">
                           <thead>
                             <tr>
-                              <th>Emp ID</th>
+                              <th style="width:78px;">Emp ID</th>
                               <th>Name</th>
-                              <th>BU</th>
-                              <th style="background:#16A34A;">Total Hrs</th>
-                              <th>Scheduled Hrs</th>
-                              <th style="background:#0F2440;">Util %</th>
+                              <th style="background:#16A34A; width:100px;">Total Hrs</th>
+                              <th style="width:110px;">Scheduled Hrs</th>
+                              <th style="background:#0F2440; width:76px;">Util %</th>
                             </tr>
                           </thead>
                           <tbody>
                             @if ((monthlyData()!.utilization_stats || []).length === 0) {
-                              <tr><td colspan="6" style="text-align:center; padding:2rem; color:#94A3B8;">No resources below threshold — everyone is well utilised.</td></tr>
+                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">No resources below threshold — everyone is well utilised.</td></tr>
                             }
                             @for (res of monthlyData()!.utilization_stats; track res.user_id) {
                               <tr style="border-bottom:1px solid #F1F5F9;">
@@ -873,7 +897,6 @@ import { AuthenticationService } from '../service/authentication.service';
                                   <div class="emp-name">{{ res.user_name }}</div>
                                   <div style="font-size:.7rem; color:#94A3B8;">{{ res.irm }}</div>
                                 </td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
                                 <td class="td-num has-val">{{ res.total_hours }}</td>
                                 <td class="td-num">{{ res.scheduled_hours }}</td>
                                 <td class="td-center"><span class="util-pct low">{{ res.utilization_pct }}%</span></td>
@@ -897,24 +920,20 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="res-table">
                           <thead>
                             <tr>
-                              <th>Emp ID</th>
+                              <th style="width:78px;">Emp ID</th>
                               <th>Name</th>
-                              <th>BU</th>
-                              <th>IRM</th>
-                              <th>IRM Email</th>
+                              <th style="width:140px;">IRM</th>
                             </tr>
                           </thead>
                           <tbody>
                             @if ((monthlyData()!.non_filling || []).length === 0) {
-                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">Everyone has submitted their timesheet for this period.</td></tr>
+                              <tr><td colspan="3" style="text-align:center; padding:2rem; color:#94A3B8;">Everyone has submitted their timesheet for this period.</td></tr>
                             }
                             @for (res of monthlyData()!.non_filling; track res.user_id) {
                               <tr style="border-bottom:1px solid #F1F5F9;">
                                 <td><span class="emp-id-badge">{{ res.yash_id }}</span></td>
                                 <td><div class="emp-name">{{ res.user_name }}</div></td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
                                 <td style="font-size:.75rem; color:#64748B;">{{ res.irm }}</td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.irm_email }}</td>
                               </tr>
                             }
                           </tbody>
@@ -957,7 +976,7 @@ import { AuthenticationService } from '../service/authentication.service';
             @if (yearlyData()) {
               <div class="chart-wrap">
                 <div class="chart-title">Monthly Hours — {{ selectedYear }} (matches "Sep'25 … Mar'26" columns in Excel)</div>
-                <p-chart type="bar" [data]="yearlyChartData()" [options]="yearlyChartOptions" height="200px" />
+                <p-chart type="bar" [data]="yearlyChartData()" [options]="yearlyChartOptions" [plugins]="yearlyChartPlugins" height="200px" />
               </div>
 
               <div class="summary-strip">
@@ -990,9 +1009,9 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="report-table">
                           <thead>
                             <tr class="tr-header">
-                              <th class="th-left" style="min-width:220px;">Manager / Project</th>
-                              @for (m of yearlyMonthLabels(); track m) { <th style="min-width:90px;">{{ m }}</th> }
-                              <th style="min-width:110px;">Total</th>
+                              <th class="th-left">Manager / Project</th>
+                              @for (m of yearlyMonthLabels(); track m) { <th style="width:90px;">{{ m }}</th> }
+                              <th style="width:110px;">Total</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1075,17 +1094,16 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="res-table">
                           <thead>
                             <tr>
-                              <th>Emp ID</th>
+                              <th style="width:78px;">Emp ID</th>
                               <th>Name</th>
-                              <th>BU / IRM</th>
-                              @for (p of yearlyTopProjects(); track p) { <th>{{ p }}</th> }
-                              <th style="background:#16A34A;">Total Hrs</th>
-                              <th style="background:#0284C7;">Billable</th>
+                              <th style="background:#16A34A; width:100px;">Total Hrs</th>
+                              <th style="background:#0284C7; width:100px;">Billable</th>
+                              <th style="width:150px;">Billable Efforts</th>
                             </tr>
                           </thead>
                           <tbody>
                             @if (yearlyFiltered().length === 0) {
-                              <tr><td [attr.colspan]="yearlyTopProjects().length + 5" style="text-align:center; padding:2rem; color:#94A3B8;">No resources match your filter.</td></tr>
+                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">No resources match your filter.</td></tr>
                             }
                             @for (res of yearlyFiltered(); track res.user_id) {
                               <tr [class.tr-zero]="res.total_hours === 0" style="border-bottom:1px solid #F1F5F9;">
@@ -1094,21 +1112,22 @@ import { AuthenticationService } from '../service/authentication.service';
                                   <div class="emp-name">{{ res.user_name }}</div>
                                   <div style="font-size:.7rem; color:#94A3B8;">{{ res.irm }}</div>
                                 </td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
-                                @for (p of yearlyTopProjects(); track p) {
-                                  <td class="td-num" [class.has-val]="getProjectHours(res, p) > 0">{{ getProjectHours(res, p) || '—' }}</td>
-                                }
                                 <td class="td-num"><span class="total-val good">{{ res.total_hours }}</span></td>
                                 <td class="td-num"><span style="color:#16A34A; font-weight:700; font-size:.82rem;">{{ res.billable_hours }}</span></td>
+                                <td class="td-center">
+                                  <p-button label="View" icon="pi pi-eye" size="small" [text]="true"
+                                    styleClass="billable-btn" (onClick)="openBillableEfforts(res)"
+                                    pTooltip="View Billable Efforts" tooltipPosition="top" />
+                                </td>
                               </tr>
                             }
                           </tbody>
                           <tfoot>
                             <tr>
-                              <td class="td-label" colspan="3">Grand Total</td>
-                              @for (p of yearlyTopProjects(); track p) { <td>{{ yearlyProjectTotal(p) || '' }}</td> }
+                              <td class="td-label" colspan="2">Grand Total</td>
                               <td>{{ yearlyFilteredTotal() }}</td>
                               <td>{{ yearlyBillableTotal() }}</td>
+                              <td></td>
                             </tr>
                           </tfoot>
                         </table>
@@ -1150,17 +1169,16 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="res-table">
                           <thead>
                             <tr>
-                              <th>Emp ID</th>
+                              <th style="width:78px;">Emp ID</th>
                               <th>Name</th>
-                              <th>BU</th>
-                              <th style="background:#16A34A;">Total Hrs</th>
-                              <th>Scheduled Hrs</th>
-                              <th style="background:#0F2440;">Util %</th>
+                              <th style="background:#16A34A; width:100px;">Total Hrs</th>
+                              <th style="width:110px;">Scheduled Hrs</th>
+                              <th style="background:#0F2440; width:76px;">Util %</th>
                             </tr>
                           </thead>
                           <tbody>
                             @if ((yearlyData()!.utilization_stats || []).length === 0) {
-                              <tr><td colspan="6" style="text-align:center; padding:2rem; color:#94A3B8;">No resources below threshold — everyone is well utilised.</td></tr>
+                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">No resources below threshold — everyone is well utilised.</td></tr>
                             }
                             @for (res of yearlyData()!.utilization_stats; track res.user_id) {
                               <tr style="border-bottom:1px solid #F1F5F9;">
@@ -1169,7 +1187,6 @@ import { AuthenticationService } from '../service/authentication.service';
                                   <div class="emp-name">{{ res.user_name }}</div>
                                   <div style="font-size:.7rem; color:#94A3B8;">{{ res.irm }}</div>
                                 </td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
                                 <td class="td-num has-val">{{ res.total_hours }}</td>
                                 <td class="td-num">{{ res.scheduled_hours }}</td>
                                 <td class="td-center"><span class="util-pct low">{{ res.utilization_pct }}%</span></td>
@@ -1193,24 +1210,20 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="res-table">
                           <thead>
                             <tr>
-                              <th>Emp ID</th>
+                              <th style="width:78px;">Emp ID</th>
                               <th>Name</th>
-                              <th>BU</th>
-                              <th>IRM</th>
-                              <th>IRM Email</th>
+                              <th style="width:140px;">IRM</th>
                             </tr>
                           </thead>
                           <tbody>
                             @if ((yearlyData()!.non_filling || []).length === 0) {
-                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">Everyone has submitted their timesheet for this period.</td></tr>
+                              <tr><td colspan="3" style="text-align:center; padding:2rem; color:#94A3B8;">Everyone has submitted their timesheet for this period.</td></tr>
                             }
                             @for (res of yearlyData()!.non_filling; track res.user_id) {
                               <tr style="border-bottom:1px solid #F1F5F9;">
                                 <td><span class="emp-id-badge">{{ res.yash_id }}</span></td>
                                 <td><div class="emp-name">{{ res.user_name }}</div></td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
                                 <td style="font-size:.75rem; color:#64748B;">{{ res.irm }}</td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.irm_email }}</td>
                               </tr>
                             }
                           </tbody>
@@ -1293,9 +1306,9 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="report-table">
                           <thead>
                             <tr class="tr-header">
-                              <th class="th-left" style="min-width:220px;">Manager / Project</th>
-                              @for (w of cd.week_labels; track w) { <th style="min-width:100px;">{{ w }}</th> }
-                              <th style="min-width:110px;">Total</th>
+                              <th class="th-left">Manager / Project</th>
+                              @for (w of cd.week_labels; track w) { <th style="width:100px;">{{ w }}</th> }
+                              <th style="width:110px;">Total</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1378,17 +1391,16 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="res-table">
                           <thead>
                             <tr>
-                              <th>Emp ID</th>
+                              <th style="width:78px;">Emp ID</th>
                               <th>Name</th>
-                              <th>BU / IRM</th>
-                              @for (p of customTopProjects(); track p) { <th>{{ p }}</th> }
-                              <th style="background:#16A34A;">Total Hrs</th>
-                              <th style="background:#0F2440;">Util %</th>
+                              <th style="background:#16A34A; width:100px;">Total Hrs</th>
+                              <th style="background:#0F2440; width:76px;">Util %</th>
+                              <th style="width:150px;">Billable Efforts</th>
                             </tr>
                           </thead>
                           <tbody>
                             @if (customFiltered().length === 0) {
-                              <tr><td [attr.colspan]="customTopProjects().length + 5" style="text-align:center; padding:2rem; color:#94A3B8;">No resources match your filter.</td></tr>
+                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">No resources match your filter.</td></tr>
                             }
                             @for (res of customFiltered(); track res.user_id) {
                               <tr [class.tr-zero]="res.total_hours === 0" style="border-bottom:1px solid #F1F5F9;">
@@ -1397,10 +1409,6 @@ import { AuthenticationService } from '../service/authentication.service';
                                   <div class="emp-name">{{ res.user_name }}</div>
                                   <div style="font-size:.7rem; color:#94A3B8;">{{ res.irm }}</div>
                                 </td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
-                                @for (p of customTopProjects(); track p) {
-                                  <td class="td-num" [class.has-val]="getProjectHours(res, p) > 0">{{ getProjectHours(res, p) || '—' }}</td>
-                                }
                                 <td>
                                   <div class="total-bar-cell">
                                     <div class="total-bar-track">
@@ -1422,15 +1430,20 @@ import { AuthenticationService } from '../service/authentication.service';
                                     {{ utilPct(res.total_hours, cd.week_labels.length*45) }}%
                                   </span>
                                 </td>
+                                <td class="td-center">
+                                  <p-button label="View" icon="pi pi-eye" size="small" [text]="true"
+                                    styleClass="billable-btn" (onClick)="openBillableEfforts(res)"
+                                    pTooltip="View Billable Efforts" tooltipPosition="top" />
+                                </td>
                               </tr>
                             }
                           </tbody>
                           <tfoot>
                             <tr>
-                              <td class="td-label" colspan="3">Grand Total</td>
-                              @for (p of customTopProjects(); track p) { <td>{{ customProjectTotal(p) || '' }}</td> }
+                              <td class="td-label" colspan="2">Grand Total</td>
                               <td>{{ customFilteredTotal() }}</td>
                               <td>{{ customUtilPct() }}%</td>
+                              <td></td>
                             </tr>
                           </tfoot>
                         </table>
@@ -1469,17 +1482,16 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="res-table">
                           <thead>
                             <tr>
-                              <th>Emp ID</th>
+                              <th style="width:78px;">Emp ID</th>
                               <th>Name</th>
-                              <th>BU</th>
-                              <th style="background:#16A34A;">Total Hrs</th>
-                              <th>Scheduled Hrs</th>
-                              <th style="background:#0F2440;">Util %</th>
+                              <th style="background:#16A34A; width:100px;">Total Hrs</th>
+                              <th style="width:110px;">Scheduled Hrs</th>
+                              <th style="background:#0F2440; width:76px;">Util %</th>
                             </tr>
                           </thead>
                           <tbody>
                             @if ((cd.utilization_stats || []).length === 0) {
-                              <tr><td colspan="6" style="text-align:center; padding:2rem; color:#94A3B8;">No resources below threshold — everyone is well utilised.</td></tr>
+                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">No resources below threshold — everyone is well utilised.</td></tr>
                             }
                             @for (res of cd.utilization_stats; track res.user_id) {
                               <tr style="border-bottom:1px solid #F1F5F9;">
@@ -1488,7 +1500,6 @@ import { AuthenticationService } from '../service/authentication.service';
                                   <div class="emp-name">{{ res.user_name }}</div>
                                   <div style="font-size:.7rem; color:#94A3B8;">{{ res.irm }}</div>
                                 </td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
                                 <td class="td-num has-val">{{ res.total_hours }}</td>
                                 <td class="td-num">{{ res.scheduled_hours }}</td>
                                 <td class="td-center"><span class="util-pct low">{{ res.utilization_pct }}%</span></td>
@@ -1512,24 +1523,20 @@ import { AuthenticationService } from '../service/authentication.service';
                         <table class="res-table">
                           <thead>
                             <tr>
-                              <th>Emp ID</th>
+                              <th style="width:78px;">Emp ID</th>
                               <th>Name</th>
-                              <th>BU</th>
-                              <th>IRM</th>
-                              <th>IRM Email</th>
+                              <th style="width:140px;">IRM</th>
                             </tr>
                           </thead>
                           <tbody>
                             @if ((cd.non_filling || []).length === 0) {
-                              <tr><td colspan="5" style="text-align:center; padding:2rem; color:#94A3B8;">Everyone has submitted their timesheet for this period.</td></tr>
+                              <tr><td colspan="3" style="text-align:center; padding:2rem; color:#94A3B8;">Everyone has submitted their timesheet for this period.</td></tr>
                             }
                             @for (res of cd.non_filling; track res.user_id) {
                               <tr style="border-bottom:1px solid #F1F5F9;">
                                 <td><span class="emp-id-badge">{{ res.yash_id }}</span></td>
                                 <td><div class="emp-name">{{ res.user_name }}</div></td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.b_unit }}</td>
                                 <td style="font-size:.75rem; color:#64748B;">{{ res.irm }}</td>
-                                <td style="font-size:.75rem; color:#64748B;">{{ res.irm_email }}</td>
                               </tr>
                             }
                           </tbody>
@@ -1553,6 +1560,33 @@ import { AuthenticationService } from '../service/authentication.service';
       </p-tabpanels>
     </p-tabs>
   </div>
+
+  <p-dialog header="Billable Efforts" [visible]="billableDialogVisible()" (visibleChange)="billableDialogVisible.set($event)"
+    [modal]="true" [dismissableMask]="true" [style]="{width:'560px', maxWidth:'92vw'}" styleClass="billable-dialog">
+    @if (billableDialogResource(); as res) {
+      <div class="billable-dialog-head">
+        <div class="billable-dialog-name">{{ res.user_name }}</div>
+        <div class="billable-dialog-sub">{{ res.yash_id }} &middot; {{ res.irm }}</div>
+      </div>
+      @if (billableDialogProjects().length === 0) {
+        <div class="billable-dialog-empty">No billable projects added for this period.</div>
+      } @else {
+        <table class="billable-dialog-table">
+          <thead>
+            <tr><th>Project</th><th class="th-r">Hours</th></tr>
+          </thead>
+          <tbody>
+            @for (p of billableDialogProjects(); track p.project_name) {
+              <tr><td>{{ p.project_name }}</td><td class="td-r">{{ p.hours }}</td></tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr><td>Total</td><td class="td-r">{{ billableDialogTotal() }}</td></tr>
+          </tfoot>
+        </table>
+      }
+    }
+  </p-dialog>
 </p-card>
   `
 })
@@ -1561,6 +1595,22 @@ export class ReportsComponent implements OnInit {
   loading   = signal(false);
   exporting = signal(false);
   activeTab = '0';
+
+  // Billable Efforts dialog (Resource wise — shared across all 4 periods)
+  billableDialogVisible  = signal(false);
+  billableDialogResource = signal<any>(null);
+  billableDialogProjects = computed((): any[] => {
+    const res = this.billableDialogResource();
+    if (!res) return [];
+    return (res.projects || [])
+      .filter((p: any) => (p.project_type || '').toLowerCase() === 'billable')
+      .sort((a: any, b: any) => b.hours - a.hours);
+  });
+  billableDialogTotal = computed((): number => {
+    const total = this.billableDialogProjects().reduce((s: number, p: any) => s + (p.hours || 0), 0);
+    return Math.round(total * 10) / 10;
+  });
+
 
   // Weekly
   weeklyDate    = new Date();
@@ -1682,22 +1732,9 @@ export class ReportsComponent implements OnInit {
   irmBillableTotal = computed(() =>
     (this.weeklyData()?.irm_summary ?? []).reduce((s: number, r: any) => s + (r.billable || 0), 0));
 
-  weeklyTopProjects = computed((): string[] => {
-    const d = this.weeklyData();
-    if (!d?.project_summary) return [];
-    return d.project_summary
-      .filter((p: any) => p.project !== 'Leave' && p.project !== 'PMO')
-      .slice(0, 8)
-      .map((p: any) => p.project);
-  });
-
-  getProjectHours(res: any, projectName: string): number {
-    const p = res.projects?.find((x: any) => x.project_name === projectName);
-    return p?.hours ?? 0;
-  }
-
-  weeklyProjectTotal(projectName: string): number {
-    return this.weeklyFiltered().reduce((s: number, r: any) => s + this.getProjectHours(r, projectName), 0);
+  openBillableEfforts(res: any) {
+    this.billableDialogResource.set(res);
+    this.billableDialogVisible.set(true);
   }
 
   weeklyUtilPct(): number {
@@ -1773,19 +1810,6 @@ export class ReportsComponent implements OnInit {
   monthlyIrmBillableTotal = computed(() =>
     (this.monthlyData()?.irm_summary ?? []).reduce((s: number, r: any) => s + (r.billable || 0), 0));
 
-  monthlyTopProjects = computed((): string[] => {
-    const d = this.monthlyData();
-    if (!d?.project_summary) return [];
-    return d.project_summary
-      .filter((p: any) => p.project !== 'Leave' && p.project !== 'PMO')
-      .slice(0, 8)
-      .map((p: any) => p.project);
-  });
-
-  monthlyProjectTotal(projectName: string): number {
-    return this.monthlyFiltered().reduce((s: number, r: any) => s + this.getProjectHours(r, projectName), 0);
-  }
-
   exportMonthly() {
     this.exporting.set(true);
     this.reportsService.exportMonthly(this.selectedYear, this.selectedMonth).subscribe({
@@ -1845,19 +1869,6 @@ export class ReportsComponent implements OnInit {
   yearlyIrmBillableTotal = computed(() =>
     (this.yearlyData()?.irm_summary ?? []).reduce((s: number, r: any) => s + (r.billable || 0), 0));
 
-  yearlyTopProjects = computed((): string[] => {
-    const d = this.yearlyData();
-    if (!d?.project_summary) return [];
-    return d.project_summary
-      .filter((p: any) => p.project !== 'Leave' && p.project !== 'PMO')
-      .slice(0, 8)
-      .map((p: any) => p.project);
-  });
-
-  yearlyProjectTotal(projectName: string): number {
-    return this.yearlyFiltered().reduce((s: number, r: any) => s + this.getProjectHours(r, projectName), 0);
-  }
-
   yearlyChartData() {
     const d = this.yearlyData();
     if (!d) return {};
@@ -1883,14 +1894,40 @@ export class ReportsComponent implements OnInit {
     };
   }
 
+  // Draws each bar's value just above it, so the same figure shown on hover
+  // is always visible without needing to hover — registered per-chart via
+  // p-chart's [plugins] input (no chartjs-plugin-datalabels dependency needed).
+  yearlyChartPlugins = [{
+    id: 'barValueLabels',
+    afterDatasetsDraw: (chart: any) => {
+      const { ctx } = chart;
+      chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        if (meta.hidden) return;
+        meta.data.forEach((bar: any, index: number) => {
+          const value = dataset.data[index];
+          if (!value) return;
+          ctx.save();
+          ctx.fillStyle = '#374151';
+          ctx.font = '600 10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(`${value}`, bar.x, bar.y - 4);
+          ctx.restore();
+        });
+      });
+    },
+  }];
+
   yearlyChartOptions = {
     responsive: true,
+    layout: { padding: { top: 20 } },
     plugins: {
       legend: { display: true, position: 'top' },
       tooltip: { callbacks: { label: (ctx: any) => ` ${ctx.raw} hrs` } },
     },
     scales: {
-      y: { beginAtZero: true, grid: { color: '#F1F5F9' }, ticks: { font: { size: 10 } } },
+      y: { beginAtZero: true, grace: '10%', grid: { color: '#F1F5F9' }, ticks: { font: { size: 10 } } },
       x: { grid: { display: false }, ticks: { font: { size: 10 } } },
     },
   };
@@ -1946,19 +1983,6 @@ export class ReportsComponent implements OnInit {
 
   customIrmBillableTotal = computed(() =>
     (this.customData()?.irm_summary ?? []).reduce((s: number, r: any) => s + (r.billable || 0), 0));
-
-  customTopProjects = computed((): string[] => {
-    const d = this.customData();
-    if (!d?.project_summary) return [];
-    return d.project_summary
-      .filter((p: any) => p.project !== 'Leave' && p.project !== 'PMO')
-      .slice(0, 8)
-      .map((p: any) => p.project);
-  });
-
-  customProjectTotal(projectName: string): number {
-    return this.customFiltered().reduce((s: number, r: any) => s + this.getProjectHours(r, projectName), 0);
-  }
 
   customWeekTotal(week: string): number {
     return this.customFiltered().reduce((s: number, r: any) =>

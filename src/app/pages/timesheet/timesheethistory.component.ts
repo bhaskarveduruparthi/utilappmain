@@ -311,14 +311,14 @@ interface TimesheetSummary {
 </p-dialog>
   `,
   styles: [`
-    .hist-page { padding: 1.5rem 2rem; max-width: 1300px; margin: 0 auto; font-size: 1rem; }
+    .hist-page { padding: 1.5rem 2rem; max-width: 1300px; margin: 0 auto; }
 
     .hist-header {
       display: flex; justify-content: space-between; align-items: flex-start;
       margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;
     }
-    .hist-title { font-size: 1.8rem; font-weight: 800; color: #111827; margin: 0 0 0.2rem; }
-    .hist-sub { font-size: 0.95rem; color: #6B7280; }
+    .hist-title { font-size: var(--fs-page-title); font-weight: 800; color: #111827; margin: 0 0 0.2rem; }
+    .hist-sub { font-size: var(--fs-page-sub); color: #6B7280; }
     .hist-controls { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
 
     /* Summary strip */
@@ -391,7 +391,7 @@ interface TimesheetSummary {
     .entries-section { }
     .entries-title { font-size: 0.85rem; font-weight: 700; color: #374151; margin: 0 0 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
 
-    .entries-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .entries-table { width: 100%; border-collapse: collapse; font-size: var(--fs-table-body); }
     .entries-table thead th {
       background: #F8FAFC; padding: 0.7rem 0.625rem;
       text-align: center; font-weight: 600; color: #374151;
@@ -426,7 +426,7 @@ interface TimesheetSummary {
     .tl-date { font-size: 0.68rem; color: #9CA3AF; }
 
     ::ng-deep .hist-table .p-datatable-tbody > tr > td { padding: 0.85rem 1rem; }
-    ::ng-deep .hist-table .p-datatable-thead > tr > th { background: #F8FAFC; padding: 1rem; font-size: 0.95rem; }
+    ::ng-deep .hist-table .p-datatable-thead > tr > th { background: #F8FAFC; padding: 1rem; font-size: var(--fs-table-header); }
   `]
 })
 export class TimesheetHistoryComponent implements OnInit {

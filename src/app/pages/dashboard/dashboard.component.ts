@@ -189,7 +189,7 @@ import { AuthenticationService } from '../service/authentication.service';
           </div>
         } @else {
           @if (trendChartData(); as chartData) {
-            <p-chart type="bar" [data]="chartData" [options]="trendChartOptions" height="260px" />
+            <p-chart type="bar" [data]="chartData" [options]="trendChartOptions" [plugins]="barValueLabelsPlugin" height="260px" />
           } @else {
             <div class="empty-chart"><i class="pi pi-chart-bar"></i><p>No trend data</p></div>
           }
@@ -532,7 +532,7 @@ import { AuthenticationService } from '../service/authentication.service';
               <div class="proj-chart-wrap">
                 <h4 class="section-sub-title">Top 15 Projects by Hours</h4>
                 @if (projectBarData(); as pbd) {
-                  <p-chart type="bar" [data]="pbd" [options]="projectBarOptions" height="380px" />
+                  <p-chart type="bar" [data]="pbd" [options]="projectBarOptions" [plugins]="barValueLabelsPlugin" height="380px" />
                 }
               </div>
 
@@ -737,14 +737,14 @@ import { AuthenticationService } from '../service/authentication.service';
       box-shadow: 0 4px 12px rgba(30,58,95,0.25);
     }
     .dash-title {
-      font-size: 1.5rem;
+      font-size: var(--fs-page-title);
       font-weight: 800;
       color: var(--slate-900);
       margin: 0 0 0.1rem;
       letter-spacing: -0.025em;
       line-height: 1.2;
     }
-    .dash-sub { font-size: 0.8rem; color: var(--slate-400); }
+    .dash-sub { font-size: var(--fs-page-sub); color: var(--slate-400); }
     .dash-header-right {
       display: flex;
       align-items: center;
@@ -1930,6 +1930,42 @@ export class DashboardComponent implements OnInit {
 
   // ── Chart builders ──
 
+  // Draws each bar's value right on/next to the bar itself (above it for a
+  // vertical bar chart, to the right of it for a horizontal one), so the
+  // same figure the tooltip already shows on hover is always visible.
+  // Registered per-chart via p-chart's [plugins] input — shared by the trend
+  // chart and the Top-15-Projects chart below (both are bar charts; the
+  // doughnut already surfaces exact values via its side legend, and the
+  // drill-down line chart is a different shape, so neither was touched).
+  barValueLabelsPlugin = [{
+    id: 'barValueLabels',
+    afterDatasetsDraw: (chart: any) => {
+      const { ctx } = chart;
+      const horizontal = chart.options?.indexAxis === 'y';
+      chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        if (meta.hidden) return;
+        meta.data.forEach((bar: any, index: number) => {
+          const value = dataset.data[index];
+          if (!value) return;
+          ctx.save();
+          ctx.fillStyle = '#374151';
+          ctx.font = '600 10px sans-serif';
+          if (horizontal) {
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${value}`, bar.x + 6, bar.y);
+          } else {
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(`${value}`, bar.x, bar.y - 4);
+          }
+          ctx.restore();
+        });
+      });
+    },
+  }];
+
   trendChartData = computed(() => {
     const d = this.trendData();
     if (!d) return null;
@@ -1948,6 +1984,7 @@ export class DashboardComponent implements OnInit {
 
   trendChartOptions = {
     responsive: true,
+    layout: { padding: { top: 20 } },
     plugins: {
       legend: {
         position: 'top' as const,
@@ -1958,7 +1995,7 @@ export class DashboardComponent implements OnInit {
     },
     scales: {
       x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 }, color: '#94A3B8' } },
-      y: { stacked: true, grid: { color: '#F1F5F9', drawBorder: false }, ticks: { font: { size: 10 }, color: '#94A3B8' } }
+      y: { stacked: true, beginAtZero: true, grace: '10%', grid: { color: '#F1F5F9', drawBorder: false }, ticks: { font: { size: 10 }, color: '#94A3B8' } }
     }
   };
 
@@ -2037,12 +2074,13 @@ export class DashboardComponent implements OnInit {
   projectBarOptions = {
     indexAxis: 'y' as const,
     responsive: true,
+    layout: { padding: { right: 32 } },
     plugins: {
       legend: { display: false },
       tooltip: { callbacks: { label: (ctx: any) => ` ${ctx.raw} hrs` } }
     },
     scales: {
-      x: { grid: { color: '#F1F5F9' }, ticks: { font: { size: 9 }, color: '#94A3B8' } },
+      x: { beginAtZero: true, grace: '10%', grid: { color: '#F1F5F9' }, ticks: { font: { size: 9 }, color: '#94A3B8' } },
       y: { grid: { display: false  }, ticks: { font: { size: 9 }, color: '#475569' } }
     }
   };

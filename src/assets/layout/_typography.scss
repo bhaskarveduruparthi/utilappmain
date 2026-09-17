@@ -1,3 +1,16 @@
+/* ─────────────────────────────────────────────────────────
+   Shared app-wide font-size scale.
+   Pages should reference these instead of hardcoding rem
+   values, so equivalent elements (page titles, subtitles,
+   data tables) render at the same size everywhere.
+   ───────────────────────────────────────────────────────── */
+:root {
+    --fs-page-title: 1.5rem;
+    --fs-page-sub: 0.875rem;
+    --fs-table-header: 0.8rem;
+    --fs-table-body: 0.85rem;
+}
+
 h1,
 h2,
 h3,

@@ -300,8 +300,8 @@ interface Allocation {
       display: flex; justify-content: space-between; align-items: flex-start;
       margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;
     }
-    .pa-title { font-size: 1.8rem; font-weight: 800; color: #111827; margin: 0 0 0.2rem; }
-    .pa-sub { font-size: 0.9rem; color: #6B7280; max-width: 640px; display: inline-block; }
+    .pa-title { font-size: var(--fs-page-title); font-weight: 800; color: #111827; margin: 0 0 0.2rem; }
+    .pa-sub { font-size: var(--fs-page-sub); color: #6B7280; max-width: 640px; display: inline-block; }
     .add-btn { background: #1E3A5F !important; border-color: #1E3A5F !important; font-weight: 600; white-space: nowrap; }
 
     .stats-bar {
@@ -371,8 +371,8 @@ interface Allocation {
 
     .save-btn { background: #1E3A5F !important; border-color: #1E3A5F !important; }
 
-    ::ng-deep .pa-table .p-datatable-tbody > tr > td { padding: 0.9rem 1rem; }
-    ::ng-deep .pa-table .p-datatable-thead > tr > th { background: #F8FAFC; padding: 1rem; font-size: 0.95rem; }
+    ::ng-deep .pa-table .p-datatable-tbody > tr > td { padding: 0.9rem 1rem; font-size: var(--fs-table-body); }
+    ::ng-deep .pa-table .p-datatable-thead > tr > th { background: #F8FAFC; padding: 1rem; font-size: var(--fs-table-header); }
     ::ng-deep .pa-dialog .p-datepicker-input, ::ng-deep .pa-dialog .p-select { width: 100%; }
   `]
 })

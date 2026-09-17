@@ -303,8 +303,8 @@ interface Customer {
       display: flex; justify-content: space-between; align-items: flex-start;
       margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;
     }
-    .mp-title { font-size: 1.8rem; font-weight: 800; color: #111827; margin: 0 0 0.2rem; }
-    .mp-sub { font-size: 0.95rem; color: #6B7280; }
+    .mp-title { font-size: var(--fs-page-title); font-weight: 800; color: #111827; margin: 0 0 0.2rem; }
+    .mp-sub { font-size: var(--fs-page-sub); color: #6B7280; }
     .add-btn { background: #1E3A5F !important; border-color: #1E3A5F !important; font-weight: 600; }
 
     /* Stats */
@@ -388,8 +388,8 @@ interface Customer {
 
     .save-btn { background: #1E3A5F !important; border-color: #1E3A5F !important; }
 
-    ::ng-deep .mp-table .p-datatable-tbody > tr > td { padding: 1rem 1rem; }
-    ::ng-deep .mp-table .p-datatable-thead > tr > th { background: #F8FAFC; padding: 1rem; font-size: 0.95rem; }
+    ::ng-deep .mp-table .p-datatable-tbody > tr > td { padding: 1rem 1rem; font-size: var(--fs-table-body); }
+    ::ng-deep .mp-table .p-datatable-thead > tr > th { background: #F8FAFC; padding: 1rem; font-size: var(--fs-table-header); }
   `]
 })
 export class ManageProjectsComponent implements OnInit {

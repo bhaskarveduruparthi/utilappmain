@@ -63,10 +63,10 @@ interface ExportColumn { title: string; dataKey: string; }
             gap: 1rem;
         }
         .page-title {
-            font-size: 1.45rem; font-weight: 800; color: #0F172A;
+            font-size: var(--fs-page-title); font-weight: 800; color: #0F172A;
             margin: 0 0 0.15rem; letter-spacing: -0.02em;
         }
-        .page-sub { font-size: 0.81rem; color: #64748B; }
+        .page-sub { font-size: var(--fs-page-sub); color: #64748B; }
 
         /* ── Toolbar ── */
         .toolbar-wrap {
@@ -126,7 +126,7 @@ interface ExportColumn { title: string; dataKey: string; }
 
         .data-table-wrap { overflow-x: auto; }
         .data-table {
-            width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 900px;
+            width: 100%; border-collapse: collapse; font-size: var(--fs-table-body); min-width: 900px;
         }
         .data-table thead th {
             background: #F8FAFC; padding: 0.7rem 0.875rem; text-align: left;
