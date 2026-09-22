@@ -15,6 +15,7 @@ export default [
     {path: 'project-allocations', loadComponent: () => import('./timesheet/projectallocations.component').then(m => m.ProjectAllocationsComponent), title: 'Project Allocations' },
     {path: 'timesheet/history', loadComponent: () => import('./timesheet/timesheethistory.component').then(m => m.TimesheetHistoryComponent), title: 'Timesheet History' },
     { path: 'reports', component: ReportsComponent, title: 'Utilization Reports' },
+    {path: 'historical-reports', loadComponent: () => import('./timesheet/historicalreports.component').then(m => m.HistoricalReportsComponent), title: 'Historical Reports' },
     { path: 'team', component: TeamTimesheetsComponent, title: 'Team Timesheets' },
     
     { path: '**', redirectTo: '/notfound' }

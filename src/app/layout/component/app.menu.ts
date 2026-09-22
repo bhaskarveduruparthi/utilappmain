@@ -49,7 +49,8 @@ export class AppMenu implements OnInit {
             label: 'Reports',
             icon: 'pi pi-fw pi-file',
             items: [
-                { label: 'Utilization Report', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/app/pages/reports'] }
+                { label: 'Utilization Report', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/app/pages/reports'] },
+                { label: 'Historical Reports', icon: 'pi pi-fw pi-history', routerLink: ['/app/pages/historical-reports'] }
             ]
         },
         {
@@ -79,7 +80,8 @@ export class AppMenu implements OnInit {
             label: 'Reports',
             icon: 'pi pi-fw pi-file',
             items: [
-                { label: 'Utilization Report', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/app/pages/reports'] }
+                { label: 'Utilization Report', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/app/pages/reports'] },
+                { label: 'Historical Reports', icon: 'pi pi-fw pi-history', routerLink: ['/app/pages/historical-reports'] }
             ]
         },
         
@@ -115,7 +117,8 @@ export class AppMenu implements OnInit {
             label: 'Reports',
             icon: 'pi pi-fw pi-file',
             items: [
-                { label: 'Utilization Report', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/app/pages/reports'] }
+                { label: 'Utilization Report', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/app/pages/reports'] },
+                { label: 'Historical Reports', icon: 'pi pi-fw pi-history', routerLink: ['/app/pages/historical-reports'] }
             ]
         }
     ];
