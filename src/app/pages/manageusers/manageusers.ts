@@ -279,17 +279,7 @@ interface ExportColumn { title: string; dataKey: string; }
                 <input class="search-input" type="text" placeholder="Search name, email, ID…"
                     (input)="onSearch($event)" />
             </div>
-            <!-- View toggle -->
-            <div class="view-toggle">
-                <button class="vt-btn" [class.active]="viewMode === 'table'"
-                    (click)="viewMode = 'table'" title="Table view">
-                    <i class="pi pi-list"></i>
-                </button>
-                <button class="vt-btn" [class.active]="viewMode === 'card'"
-                    (click)="viewMode = 'card'" title="Card view">
-                    <i class="pi pi-th-large"></i>
-                </button>
-            </div>
+            
             @if (isAdminRole) {
                 <button class="btn-primary" (click)="openNew()">
                     <i class="pi pi-plus"></i> Add User
@@ -633,9 +623,13 @@ export class ManageUsers implements OnInit {
     submitted          = false;
     filteredUsersList : User[] = [];
     totalitems         = 0;
-    currentPage        = 1;
-    first              = 0;
-    rows               = 10;
+    // Page + page size are persisted in localStorage so add/edit/delete (and a
+    // browser refresh) keep the user on the page they were on.
+    private static readonly PAGE_KEY = 'employeeMaster.page';
+    private static readonly ROWS_KEY = 'employeeMaster.rows';
+    rows               = ManageUsers.readStored(ManageUsers.ROWS_KEY, 10);
+    currentPage        = Math.max(1, ManageUsers.readStored(ManageUsers.PAGE_KEY, 1));
+    first              = (this.currentPage - 1) * this.rows;
     searchTerm         = '';
     private searchSubject = new Subject<string>();
     loading            = true;
@@ -702,8 +696,7 @@ export class ManageUsers implements OnInit {
     ngOnInit() {
         this.loadUsers();
         this.searchSubject.pipe(debounceTime(400), distinctUntilChanged()).subscribe(term => {
-            this.currentPage = 1;
-            this.first = 0;
+            this.setPage(1);
             this.loadUsers(1, term);
         });
         this.cols = [
@@ -723,6 +716,23 @@ export class ManageUsers implements OnInit {
     // Server-side pagination + search: getallusers now returns only the
     // current page ({data, totalrecords, page, pages}) instead of every
     // user in one response - see resources/user_views.py.
+    private static readStored(key: string, fallback: number): number {
+        try {
+            const raw = localStorage.getItem(key);
+            const v = raw === null ? NaN : Number(raw);
+            return Number.isFinite(v) && v > 0 ? v : fallback;
+        } catch { return fallback; }
+    }
+
+    private setPage(page: number) {
+        this.currentPage = page;
+        this.first = (page - 1) * this.rows;
+        try {
+            localStorage.setItem(ManageUsers.PAGE_KEY, String(page));
+            localStorage.setItem(ManageUsers.ROWS_KEY, String(this.rows));
+        } catch {}
+    }
+
     loadUsers(page: number = this.currentPage, search: string = this.searchTerm) {
         this.loading = true;
         this.manageadminservice.getUsers(page, search, this.rows).subscribe({
@@ -731,7 +741,14 @@ export class ManageUsers implements OnInit {
                 this.users.set(list);
                 this.filteredUsersList = list;
                 this.totalitems = res?.totalrecords ?? list.length;
-                this.currentPage = res?.page ?? page;
+                // Stored/current page is now past the end (e.g. last user on
+                // the last page was deleted) - fall back to the new last page.
+                const lastPage = Math.max(1, Math.ceil(this.totalitems / this.rows));
+                if (!list.length && page > 1 && page > lastPage) {
+                    this.loadUsers(lastPage, search);
+                    return;
+                }
+                this.setPage(res?.page ?? page);
                 this.loading = false;
             },
             error: () => {
@@ -754,9 +771,8 @@ export class ManageUsers implements OnInit {
     }
 
     onPageChange(event: any) {
-        this.first = event.first;
         this.rows = event.rows;
-        this.currentPage = event.page + 1;
+        this.setPage(event.page + 1);
         this.loadUsers(this.currentPage, this.searchTerm);
     }
 
@@ -801,7 +817,7 @@ export class ManageUsers implements OnInit {
             this.submitted = true;
             this.userEditDialog = false;
             this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'User updated successfully', life: 3000 });
-            this.reloadPage();
+            this.loadUsers(this.currentPage, this.searchTerm);
         });
     }
 
@@ -809,7 +825,7 @@ export class ManageUsers implements OnInit {
         this.manageadminservice.delete_user(yash_id).subscribe(() => {
             this.deleteUserDialog = false;
             this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'User deleted', life: 3000 });
-            this.reloadPage();
+            this.loadUsers(this.currentPage, this.searchTerm);
         });
     }
 

@@ -1,8 +1,8 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -97,7 +97,10 @@ interface Customer {
       [value]="filteredProjects()"
       [loading]="loading()"
       [paginator]="true"
-      [rows]="15"
+      [rows]="projRows()"
+      [first]="projFirst()"
+      (firstChange)="setProjFirst($event)"
+      (rowsChange)="setProjRows($event)"
       [rowsPerPageOptions]="[10, 15, 25, 50]"
       styleClass="mp-table"
       sortField="project_name"
@@ -108,10 +111,10 @@ interface Customer {
         <div class="table-cap">
           <div class="type-filter-tabs">
             <button class="ftab" [class.active]="activeTypeFilter() === ''"
-              (click)="activeTypeFilter.set('')">All</button>
+              (click)="setTypeFilter('')">All</button>
             @for (t of projectTypes; track t.value) {
               <button class="ftab" [class.active]="activeTypeFilter() === t.value"
-                (click)="activeTypeFilter.set(t.value)">{{ t.label }}</button>
+                (click)="setTypeFilter(t.value)">{{ t.label }}</button>
             }
           </div>
           <p-iconfield>
@@ -409,6 +412,15 @@ export class ManageProjectsComponent implements OnInit {
 
   projects = signal<Project[]>([]);
   filteredProjects = signal<Project[]>([]);
+
+  // Current page offset + page size are persisted in localStorage so that
+  // edit / activate-toggle / delete (and a browser refresh) keep the user
+  // on the page they were on instead of jumping back to page 1.
+  private static readonly FIRST_KEY = 'manageProjects.first';
+  private static readonly ROWS_KEY = 'manageProjects.rows';
+  projFirst = signal(ManageProjectsComponent.readStored(ManageProjectsComponent.FIRST_KEY, 0));
+  projRows = signal(ManageProjectsComponent.readStored(ManageProjectsComponent.ROWS_KEY, 15));
+  @ViewChild('dt') dt?: Table;
   customers = signal<Customer[]>([]);
 
   customerOptions: { label: string; value: number }[] = [];
@@ -465,12 +477,30 @@ export class ManageProjectsComponent implements OnInit {
     this.loadCustomers();
   }
 
+  private static readStored(key: string, fallback: number): number {
+    try {
+      const raw = localStorage.getItem(key);
+      const v = raw === null ? NaN : Number(raw);
+      return Number.isFinite(v) && v >= 0 ? v : fallback;
+    } catch { return fallback; }
+  }
+
+  setProjFirst(first: number) {
+    this.projFirst.set(first);
+    try { localStorage.setItem(ManageProjectsComponent.FIRST_KEY, String(first)); } catch {}
+  }
+
+  setProjRows(rows: number) {
+    this.projRows.set(rows);
+    try { localStorage.setItem(ManageProjectsComponent.ROWS_KEY, String(rows)); } catch {}
+  }
+
   loadProjects() {
     this.loading.set(true);
     this.http.get<Project[]>(`${this.apiBase}/timesheet/projects?include_inactive=true`).subscribe({
       next: (data) => {
         this.projects.set(data);
-        this.applyFilter();
+        this.applyFilter(false);   // reload after save/delete: stay on current page
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -491,7 +521,12 @@ export class ManageProjectsComponent implements OnInit {
     });
   }
 
-  applyFilter() {
+  /**
+   * @param resetPage true when the search text changed (go to page 1);
+   *                  false after load/edit/toggle/delete (stay on the current
+   *                  page, clamped to the last page if the list got shorter).
+   */
+  applyFilter(resetPage = true) {
     let result = this.projects();
     if (this.activeTypeFilter()) {
       result = result.filter(p => p.project_type === this.activeTypeFilter());
@@ -505,6 +540,21 @@ export class ManageProjectsComponent implements OnInit {
       );
     }
     this.filteredProjects.set(result);
+
+    const rows = this.projRows();
+    const lastPageFirst = result.length ? Math.floor((result.length - 1) / rows) * rows : 0;
+    const target = resetPage ? 0 : Math.min(this.projFirst(), lastPageFirst);
+    this.setProjFirst(target);
+    // Push it into the table explicitly after it re-renders with the new
+    // value, in case p-table reset its internal offset on the data change.
+    setTimeout(() => { if (this.dt) this.dt.first = target; });
+  }
+
+  // Type tabs (All / Billable / ...) - set the filter and re-apply it,
+  // starting from page 1 like the search box does.
+  setTypeFilter(type: string) {
+    this.activeTypeFilter.set(type);
+    this.applyFilter();
   }
 
   activeCount() { return this.projects().filter(p => p.active === 'Y').length; }
@@ -578,7 +628,7 @@ export class ManageProjectsComponent implements OnInit {
         this.projects.update(list =>
           list.map(p => p.id === project.id ? { ...p, active: active ? 'Y' : 'N' } : p)
         );
-        this.applyFilter();
+        this.applyFilter(false);
       }
     });
   }

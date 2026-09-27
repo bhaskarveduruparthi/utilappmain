@@ -585,7 +585,10 @@ export class TeamTimesheetsComponent implements OnInit {
   rejecting = signal(false);
   allTeamData = signal<TeamMember[]>([]);
   filteredData = signal<TeamMember[]>([]);
-  teamFirst = signal(0);
+  // Current page offset is persisted in localStorage so that approving /
+  // rejecting (or a page refresh) keeps the user on the page they were on.
+  private static readonly PAGE_STORAGE_KEY = 'teamBillable.first';
+  teamFirst = signal(TeamTimesheetsComponent.readStoredFirst());
   teamRows = signal(10);
   pagedData = computed(() => {
     const first = this.teamFirst();
@@ -699,7 +702,8 @@ export class TeamTimesheetsComponent implements OnInit {
         this.currentWeekStart = new Date(res.week_start);
       }
 
-      this.applyStatusFilter();
+      // Initial load restores the stored page; switching weeks starts at page 1.
+      this.applyStatusFilter(!isInitialLoad);
       this.loading.set(false);
     },
 
@@ -711,7 +715,24 @@ export class TeamTimesheetsComponent implements OnInit {
   });
 }
 
-  applyStatusFilter() {
+  private static readStoredFirst(): number {
+    try {
+      const v = Number(localStorage.getItem(TeamTimesheetsComponent.PAGE_STORAGE_KEY));
+      return Number.isFinite(v) && v > 0 ? v : 0;
+    } catch { return 0; }
+  }
+
+  private setTeamFirst(first: number) {
+    this.teamFirst.set(first);
+    try { localStorage.setItem(TeamTimesheetsComponent.PAGE_STORAGE_KEY, String(first)); } catch {}
+  }
+
+  /**
+   * @param resetPage true when the filter/search/week changed (go to page 1);
+   *                  false after approve/reject/reload (stay on the current page,
+   *                  clamped to the last page if the list got shorter).
+   */
+  applyStatusFilter(resetPage = true) {
     let result = this.selectedStatus
       ? this.allTeamData().filter(m => m.status === this.selectedStatus)
       : this.allTeamData();
@@ -725,7 +746,14 @@ export class TeamTimesheetsComponent implements OnInit {
     }
 
     this.filteredData.set(result);
-    this.teamFirst.set(0);
+
+    if (resetPage) {
+      this.setTeamFirst(0);
+    } else {
+      const rows = this.teamRows();
+      const lastPageFirst = result.length ? Math.floor((result.length - 1) / rows) * rows : 0;
+      this.setTeamFirst(Math.min(this.teamFirst(), lastPageFirst));
+    }
   }
 
   filterByStatus(val: string | null) {
@@ -735,7 +763,7 @@ export class TeamTimesheetsComponent implements OnInit {
 
   clearFilter() { this.selectedStatus = null; this.searchTerm = ''; this.applyStatusFilter(); }
 
-  onTeamPageChange(event: any) { this.teamFirst.set(event.first); this.teamRows.set(event.rows); }
+  onTeamPageChange(event: any) { this.teamRows.set(event.rows); this.setTeamFirst(event.first); }
 
   rowClass(item: TeamMember) {
     if (item.status === 'Not Submitted') return 'row-not-submitted';
@@ -787,7 +815,7 @@ export class TeamTimesheetsComponent implements OnInit {
             : m
           )
         );
-        this.applyStatusFilter();
+        this.applyStatusFilter(false);
         this.messageService.add({
           severity: 'success', summary: 'Approved',
           detail: `${item.user_name}'s Billable Effort approved`
@@ -818,7 +846,7 @@ export class TeamTimesheetsComponent implements OnInit {
             : m
           )
         );
-        this.applyStatusFilter();
+        this.applyStatusFilter(false);
         this.rejecting.set(false);
         this.rejectVisible = false;
         this.messageService.add({
@@ -858,7 +886,7 @@ export class TeamTimesheetsComponent implements OnInit {
               : m
             )
           );
-          this.applyStatusFilter();
+          this.applyStatusFilter(false);
           if (done === pending.length) {
             this.messageService.add({ severity: 'success', summary: 'All Approved', detail: `${done} Billable Efforts approved` });
           }
